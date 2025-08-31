@@ -15,7 +15,7 @@ namespace smart_home::daemon {
         , public utilities::patterns::Singleton<SignalDaemon>
     {
     private:
-        const std::vector<int> signalsHandled;
+        std::vector<int> signalsHandled;
         std::thread shutdownThread;
 
         static void handleShutdownSignal(int signal);

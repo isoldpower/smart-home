@@ -9,14 +9,15 @@
 
 
 namespace smart_home::playground {
+    using namespace smart_home::utilities::patterns;
 
     int readUserInput();
 
-    template <typename T>
-    bool validateUserInput(const std::vector<T>& commands, int commandIndex);
+    template <typename T, size_t N>
+    bool validateUserInput(const std::array<T, N>& commands, int commandIndex);
 
     int runPlaygroundEntrypoint() {
-        const std::vector<utilities::patterns::PresentableCommand<int>*> commands = {
+        const std::array<PresentableCommand<int>*, 2> commands = {
             new commands::DelayedDaemonCommand{},
             new commands::ProtocolSerializationCommand{},
         };
@@ -53,8 +54,8 @@ namespace smart_home::playground {
         }
     }
 
-    template <typename T>
-    bool validateUserInput(const std::vector<T>& commands, int commandIndex) {
+    template <typename T, size_t N>
+    bool validateUserInput(const std::array<T, N>& commands, int commandIndex) {
         return commandIndex >= 0 && commandIndex < static_cast<int>(commands.size());
     }
 

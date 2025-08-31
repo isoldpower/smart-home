@@ -21,6 +21,7 @@ namespace smart_home::daemon {
             freeSingletonInstance();
         }
 
+        signalsHandled.shrink_to_fit();
         Singleton::setInstance(this);
     }
 
