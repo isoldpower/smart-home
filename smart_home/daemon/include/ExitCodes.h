@@ -1,0 +1,8 @@
+#pragma once
+
+enum DaemonExitCodes {
+    EXT_SUCCESS_GRACEFUL = 200,
+    EXT_SUCCESS_FORCED = 201,
+    EXT_ERR_SHUTDOWN_INTERRUPTED = 400,
+    EXT_ERR_DAEMON_NULLPTR = 401
+};

@@ -1,2 +1,2 @@
-add_executable(print_hello print_hello.cpp)
-target_link_libraries(print_hello PRIVATE tools cxx_setup)
+add_executable(daemon_showcase daemon_showcase.cpp)
+target_link_libraries(daemon_showcase PRIVATE daemon cxx_setup)
