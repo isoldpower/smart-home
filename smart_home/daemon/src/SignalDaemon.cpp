@@ -8,7 +8,6 @@
 
 
 namespace smart_home::daemon {
-    SignalDaemon* SignalDaemon::activeInstance = nullptr;
 
     SignalDaemon::SignalDaemon(std::vector<int> signals)
         : signalsHandled(std::move(signals))
@@ -16,13 +15,13 @@ namespace smart_home::daemon {
         , isShuttingDown(false)
         , isForcedShutdown(false)
     {
-        if (SignalDaemon::getActiveInstance() != nullptr) {
+        if (Singleton::getInstance() != nullptr) {
             std::cerr << "SignalDaemon instance already exists. There can be only one daemon running at a time." << std::endl;
             std::cout << "Reallocating the memory..." << std::endl;
             freeSingletonInstance();
         }
 
-        activeInstance = this;
+        Singleton::setInstance(this);
     }
 
     SignalDaemon::~SignalDaemon() {
@@ -69,16 +68,8 @@ namespace smart_home::daemon {
         }
     }
 
-    SignalDaemon* SignalDaemon::getActiveInstance() {
-        return activeInstance;
-    }
-
-    bool SignalDaemon::getIsRunning() const {
-        return isRunning.load();
-    }
-
     bool SignalDaemon::getIsActive() const {
-        const bool isActiveInstance = this == SignalDaemon::getActiveInstance();
+        const bool isActiveInstance = this == Singleton::getInstance();
         const bool isNotShuttingDown = !isShuttingDown.load();
         const bool isCurrentlyRunning = isRunning.load();
 
@@ -87,7 +78,7 @@ namespace smart_home::daemon {
 
     void SignalDaemon::handleShutdownSignal(int signalCode) {
         std::cout << "Received shutdown signal: " << signalCode << std::endl;
-        if (SignalDaemon* runningDaemon = SignalDaemon::getActiveInstance()) {
+        if (SignalDaemon* runningDaemon = Singleton::getInstance()) {
             runningDaemon->shutdown();
         } else {
             std::cerr << "No active SignalDaemon instance found. Exiting now." << std::endl;
@@ -96,7 +87,7 @@ namespace smart_home::daemon {
     }
 
     void SignalDaemon::freeSingletonInstance() const {
-        if (SignalDaemon* runningDaemon = SignalDaemon::getActiveInstance()) {
+        if (SignalDaemon* runningDaemon = Singleton::getInstance()) {
             if (runningDaemon->isShuttingDown.load()) {
                 std::cerr << "Cannot free the singleton instance while it's shutting down." << std::endl;
                 std::cerr << "Escalating to force-quit and waiting for shutdown to complete..." << std::endl;
@@ -107,7 +98,7 @@ namespace smart_home::daemon {
             }
 
             std::free(runningDaemon);
-            activeInstance = nullptr;
+            Singleton::setInstance(nullptr);
         }
     }
 

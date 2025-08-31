@@ -23,7 +23,7 @@ class DelayedSignalDaemon : public SignalDaemon {
 };
 
 int main() {
-    DaemonProcess* daemon = new SignalDaemon();
+    DaemonProcess* daemon = new DelayedSignalDaemon();
     daemon->bootstrap();
     while (daemon->getIsActive()) {
         std::cout << "Running..." << std::endl;
