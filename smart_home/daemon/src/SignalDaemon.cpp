@@ -112,24 +112,17 @@ namespace smart_home::daemon {
     }
 
     void SignalDaemon::handleShutdown() {
-        int seconds = 5;
-        std::cout << "1) Simulating high workload during shutdown (5 seconds)..." << std::endl;
-        for (int i = 0; i < seconds; i++) {
-            if (isForcedShutdown.load()) {
-                std::cerr << "Forced shutdown handled. Exiting now." << std::endl;
-                std::exit(DaemonExitCodes::EXT_ERR_SHUTDOWN_FORCED);
-            }
+        onBeforeShutdown();
 
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
-
-        std::cout << "2) Falling back to default signal handlers..." << std::endl;
+        std::cout << "- Falling back to default signal handlers..." << std::endl;
         for (const int signalIterator : signalsHandled) {
             signal(signalIterator, SIG_DFL);
         }
 
-        std::cout << "3) Updating instance state to idle" << std::endl;
+        std::cout << "- Updating instance state to idle" << std::endl;
         isRunning.store(false);
         std::cout << "Cleanup completed. Exiting now." << std::endl;
+
+        onAfterShutdown();
     }
 }
