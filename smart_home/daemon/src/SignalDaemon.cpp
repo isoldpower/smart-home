@@ -1,9 +1,8 @@
 #include "../include/SignalDaemon.h"
 
-#include <unistd.h>
-
 #include <iostream>
 #include <ostream>
+#include <thread>
 
 #include "../include/ExitCodes.h"
 
@@ -15,6 +14,7 @@ namespace smart_home::daemon {
         : signalsHandled(std::move(signals))
         , isRunning(false)
         , isShuttingDown(false)
+        , isForcedShutdown(false)
     {
         if (SignalDaemon::getActiveInstance() != nullptr) {
             std::cerr << "SignalDaemon instance already exists. There can be only one daemon running at a time." << std::endl;
@@ -26,7 +26,7 @@ namespace smart_home::daemon {
     }
 
     SignalDaemon::~SignalDaemon() {
-        if (isRunning && !isShuttingDown) {
+        if (isRunning.load() && !isShuttingDown.load()) {
             SignalDaemon::shutdown();
         }
 
@@ -35,25 +35,38 @@ namespace smart_home::daemon {
 
     void SignalDaemon::shutdown() {
         std::cout << "Daemon received shutdown call" << std::endl;
-        if (isShuttingDown) {
-            std::cout << "Forcing shutdown..." << std::endl;
-            std::free(this);
-            std::exit(DaemonExitCodes::EXT_ERR_SHUTDOWN_INTERRUPTED);
+        if (isShuttingDown.load()) {
+            std::cerr << "Force shutdown requested. Escalating priority..." << std::endl;
+            isForcedShutdown.store(true);
+        } else {
+            std::cout << "Shutting down the process gracefully..." << std::endl
+                      << "\t↳ Press Ctrl + C again to force quit (not recommended)." << std::endl;
+            isShuttingDown.store(true);
+            shutdownThread = std::thread(&SignalDaemon::handleShutdown, this);
         }
-
-        std::cout << "Shutting down the process..." << std::endl
-                  << "\tPress Ctrl + C again to force quit (not recommended)." << std::endl;
-        isShuttingDown = true;
-        handleShutdown();
     }
 
     void SignalDaemon::bootstrap() {
-        isRunning = true;
-        for (size_t i = 0; i < signalsHandled.size(); i++) {
-            signal(signalsHandled[i], SignalDaemon::handleShutdownSignal);
+        isRunning.store(true);
+        for (const int signalIterator : signalsHandled) {
+            signal(signalIterator, SignalDaemon::handleShutdownSignal);
         }
 
         std::cout << "Process is running. Press Ctrl + C to quit." << std::endl;
+    }
+
+    void SignalDaemon::waitForShutdown() {
+        if (!isShuttingDown.load()) {
+            std::cerr << "Daemon is not shutting down. Cannot wait for shutdown." << std::endl;
+            return;
+        }
+
+        if (shutdownThread.joinable()) {
+            shutdownThread.join();
+        } else {
+            std::cerr << "Shutdown thread is not joinable. Exiting now." << std::endl;
+            std::exit(DaemonExitCodes::EXT_ERR_SHUTDOWN_INTERRUPTED);
+        }
     }
 
     SignalDaemon* SignalDaemon::getActiveInstance() {
@@ -61,7 +74,15 @@ namespace smart_home::daemon {
     }
 
     bool SignalDaemon::getIsRunning() const {
-        return isRunning;
+        return isRunning.load();
+    }
+
+    bool SignalDaemon::getIsActive() const {
+        const bool isActiveInstance = this == SignalDaemon::getActiveInstance();
+        const bool isNotShuttingDown = !isShuttingDown.load();
+        const bool isCurrentlyRunning = isRunning.load();
+
+        return isActiveInstance && isNotShuttingDown && isCurrentlyRunning;
     }
 
     void SignalDaemon::handleShutdownSignal(int signalCode) {
@@ -76,7 +97,12 @@ namespace smart_home::daemon {
 
     void SignalDaemon::freeSingletonInstance() const {
         if (SignalDaemon* runningDaemon = SignalDaemon::getActiveInstance()) {
-            if (runningDaemon->isRunning && runningDaemon != this) {
+            if (runningDaemon->isShuttingDown.load()) {
+                std::cerr << "Cannot free the singleton instance while it's shutting down." << std::endl;
+                std::cerr << "Escalating to force-quit and waiting for shutdown to complete..." << std::endl;
+                runningDaemon->isForcedShutdown.store(true);
+                runningDaemon->waitForShutdown();
+            } else if (runningDaemon->isRunning.load() && runningDaemon != this) {
                 runningDaemon->shutdown();
             }
 
@@ -86,12 +112,24 @@ namespace smart_home::daemon {
     }
 
     void SignalDaemon::handleShutdown() {
-        isRunning = false;
-        sleep(5);
+        int seconds = 5;
+        std::cout << "1) Simulating high workload during shutdown (5 seconds)..." << std::endl;
+        for (int i = 0; i < seconds; i++) {
+            if (isForcedShutdown.load()) {
+                std::cerr << "Forced shutdown handled. Exiting now." << std::endl;
+                std::exit(DaemonExitCodes::EXT_ERR_SHUTDOWN_FORCED);
+            }
 
-        for (size_t i = 0; i < signalsHandled.size(); i++) {
-            signal(signalsHandled[i], SIG_DFL);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+
+        std::cout << "2) Falling back to default signal handlers..." << std::endl;
+        for (const int signalIterator : signalsHandled) {
+            signal(signalIterator, SIG_DFL);
+        }
+
+        std::cout << "3) Updating instance state to idle" << std::endl;
+        isRunning.store(false);
         std::cout << "Cleanup completed. Exiting now." << std::endl;
     }
 }

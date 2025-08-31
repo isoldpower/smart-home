@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/signal.h>
+#include <thread>
 #include <vector>
 
 #include "./Daemon.h"
@@ -10,8 +11,10 @@ namespace smart_home::daemon {
     class SignalDaemon : public DaemonProcess {
     private:
         const std::vector<int> signalsHandled;
-        bool isRunning = false;
-        bool isShuttingDown = false;
+        std::atomic<bool> isRunning{false};
+        std::atomic<bool> isShuttingDown{false};
+        std::atomic<bool> isForcedShutdown{false};
+        std::thread shutdownThread;
 
         static void handleShutdownSignal(int signal);
         void freeSingletonInstance() const;
@@ -23,7 +26,9 @@ namespace smart_home::daemon {
 
         void shutdown() override;
         void bootstrap() override;
+        void waitForShutdown() override;
         [[nodiscard]] static SignalDaemon* getActiveInstance();
-        [[nodiscard]] bool getIsRunning() const override;
+        [[nodiscard]] bool getIsRunning() const;
+        [[nodiscard]] bool getIsActive() const override;
     };
 }
