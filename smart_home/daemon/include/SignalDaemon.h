@@ -1,7 +1,8 @@
 #pragma once
 
-#include <smart_home/utilities/include/Singleton.h>
+#include <../../utilities/include/patterns/Singleton.h>
 #include <sys/signal.h>
+
 #include <thread>
 #include <vector>
 
@@ -11,7 +12,7 @@ namespace smart_home::daemon {
 
     class SignalDaemon
         : public DaemonProcess
-        , public utilities::Singleton<SignalDaemon>
+        , public utilities::patterns::Singleton<SignalDaemon>
     {
     private:
         const std::vector<int> signalsHandled;

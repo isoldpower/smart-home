@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace smart_home::utilities {
+namespace smart_home::utilities::patterns {
 
     template <typename T>
     class Singleton {
