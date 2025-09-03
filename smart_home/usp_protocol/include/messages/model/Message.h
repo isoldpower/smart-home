@@ -1,0 +1,33 @@
+#pragma once
+
+#include "smart_home/usp_protocol/include/messages/CommonMessageData.h"
+
+
+namespace smart_home::usp_protocol::messages::model {
+
+    class IValidatable {
+    public:
+        virtual ~IValidatable() = default;
+        [[nodiscard]] virtual bool isValid() const = 0;
+    };
+
+    struct Message
+        : public CommonMessageData
+        , public IValidatable
+    {
+        explicit Message(
+            const ProtocolVersion& protocolVersion,
+            std::string sessionId,
+            const MessageType& messageType,
+            const time_t& timestamp
+        )
+            : CommonMessageData(
+                protocolVersion,
+                std::move(sessionId),
+                messageType,
+                timestamp
+            )
+        {}
+    };
+
+} // namespace smart_home::usp_protocol::messages::model
