@@ -10,7 +10,7 @@
 
 namespace smart_home::usp_protocol::messages {
 
-    enum ProtocolSegmentsIndex : size_t {
+    enum class ProtocolSegmentsIndex : size_t {
         VERSION = 0,
         SESSION_ID = 1,
         MESSAGE_TYPE = 2,
@@ -22,11 +22,11 @@ namespace smart_home::usp_protocol::messages {
         internal_Count = 7
     };
 
-    inline constexpr int PROTOCOL_CHUNKS_AMOUNT = ProtocolSegmentsIndex::internal_Count;
+    inline constexpr int PROTOCOL_CHUNKS_AMOUNT = static_cast<size_t>(ProtocolSegmentsIndex::internal_Count);
 
     using ProtocolMessageRaw = BinaryMessageRaw<PROTOCOL_CHUNKS_AMOUNT>;
 
-    enum ProtocolAction : uint8_t {
+    enum class ProtocolAction : uint8_t {
         ACTION_HANDSHAKE = 0x00,
         ACTION_TERMINATE = 0x01,
         ACTION_HEARTBEAT = 0x02,
@@ -47,7 +47,7 @@ namespace smart_home::usp_protocol::messages {
             const size_t& size,
             std::string data
         )
-            : model::Message(protocolVersion, std::move(sessionId), MESSAGE_PROTOCOL, timestamp)
+            : model::Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_PROTOCOL, timestamp)
             , action(action)
             , size(size)
             , data(std::move(data))

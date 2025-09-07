@@ -10,7 +10,7 @@
 
 namespace smart_home::usp_protocol::messages {
 
-    enum ResponseSegmentsIndex : size_t {
+    enum class ResponseSegmentsIndex : size_t {
         VERSION = 0,
         SESSION_ID = 1,
         MESSAGE_TYPE = 2,
@@ -25,11 +25,11 @@ namespace smart_home::usp_protocol::messages {
         internal_Count = 10
     };
 
-    inline constexpr int RESPONSE_CHUNKS_AMOUNT = ResponseSegmentsIndex::internal_Count;
+    inline constexpr int RESPONSE_CHUNKS_AMOUNT = static_cast<size_t>(ResponseSegmentsIndex::internal_Count);
 
     using ResponseMessageRaw = BinaryMessageRaw<RESPONSE_CHUNKS_AMOUNT>;
 
-    enum ResponseStatus : uint8_t {
+    enum class ResponseStatus : uint8_t {
         STATUS_OK = 0x00,
         STATUS_ERROR = 0x01,
         STATUS_UNAUTHORIZED = 0x02,
@@ -56,7 +56,7 @@ namespace smart_home::usp_protocol::messages {
             const size_t& size,
             std::string data
         )
-            : model::Message(protocolVersion, std::move(sessionId), MESSAGE_REQUEST, timestamp)
+            : model::Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_REQUEST, timestamp)
             , packetsCount(packetsCount)
             , packetIndex(packetIndex)
             , requestId(std::move(requestId))

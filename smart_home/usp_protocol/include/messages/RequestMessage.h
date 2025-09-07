@@ -10,7 +10,7 @@
 
 namespace smart_home::usp_protocol::messages {
 
-    enum RequestSegmentsIndex : size_t {
+    enum class RequestSegmentsIndex : size_t {
         VERSION = 0,
         SESSION_ID = 1,
         MESSAGE_TYPE = 2,
@@ -27,7 +27,7 @@ namespace smart_home::usp_protocol::messages {
         internal_Count = 12
     };
 
-    inline constexpr int REQUEST_CHUNKS_AMOUNT = RequestSegmentsIndex::internal_Count;
+    inline constexpr int REQUEST_CHUNKS_AMOUNT = static_cast<size_t>(RequestSegmentsIndex::internal_Count);
 
     using RequestMessageRaw = BinaryMessageRaw<REQUEST_CHUNKS_AMOUNT>;
 
@@ -55,7 +55,7 @@ namespace smart_home::usp_protocol::messages {
             const size_t& size,
             std::string data
         )
-            : model::Message(protocolVersion, std::move(sessionId), MESSAGE_REQUEST, timestamp)
+            : model::Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_REQUEST, timestamp)
             , packetsCount(packetsCount)
             , packetIndex(packetIndex)
             , requestId(std::move(requestId))

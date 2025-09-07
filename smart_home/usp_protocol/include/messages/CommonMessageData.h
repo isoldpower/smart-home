@@ -7,11 +7,11 @@
 
 namespace smart_home::usp_protocol::messages {
 
-    enum ProtocolVersion : uint8_t {
+    enum class ProtocolVersion : uint8_t {
         VERSION_1 = 1,
     };
 
-    enum MessageType : uint8_t {
+    enum class MessageType : uint8_t {
         MESSAGE_REQUEST = 0x00,
         MESSAGE_RESPONSE = 0x01,
         MESSAGE_ACKNOWLEDGEMENT = 0x02,

@@ -1,6 +1,6 @@
 #pragma once
 
-enum DaemonExitCodes {
+enum DaemonExitCodes : int {
     EXT_SUCCESS_GRACEFUL = 200,
     EXT_SUCCESS_FORCED = 201,
     EXT_ERR_SHUTDOWN_INTERRUPTED = 400,

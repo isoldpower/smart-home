@@ -6,6 +6,7 @@
 
 #include "../include/commands/DelayedDaemonCommand.h"
 #include "../include/commands/ProtocolSerializationCommand.h"
+#include "../include/commands/UspServerRequestCommand.h"
 
 
 namespace smart_home::playground {
@@ -17,9 +18,10 @@ namespace smart_home::playground {
     bool validateUserInput(const std::array<T, N>& commands, int commandIndex);
 
     int runPlaygroundEntrypoint() {
-        const std::array<PresentableCommand<int>*, 2> commands = {
+        const std::array<PresentableCommand<int>*, 3> commands = {
             new commands::DelayedDaemonCommand{},
             new commands::ProtocolSerializationCommand{},
+            new commands::UspServerRequestCommand{}
         };
 
         for (size_t i = 0; i < commands.size(); i++) {

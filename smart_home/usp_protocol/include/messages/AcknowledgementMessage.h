@@ -10,7 +10,7 @@
 
 namespace smart_home::usp_protocol::messages {
 
-    enum AcknowledgementSegmentsIndex : size_t {
+    enum class AcknowledgementSegmentsIndex : size_t {
         VERSION = 0,
         SESSION_ID = 1,
         MESSAGE_TYPE = 2,
@@ -23,11 +23,11 @@ namespace smart_home::usp_protocol::messages {
         internal_Count = 8
     };
 
-    inline constexpr int ACKNOWLEDGEMENT_CHUNKS_AMOUNT = AcknowledgementSegmentsIndex::internal_Count;
+    inline constexpr int ACKNOWLEDGEMENT_CHUNKS_AMOUNT = static_cast<size_t>(AcknowledgementSegmentsIndex::internal_Count);
 
     using AcknowledgementMessageRaw = BinaryMessageRaw<ACKNOWLEDGEMENT_CHUNKS_AMOUNT>;
 
-    enum AcknowledgementStatus : uint8_t {
+    enum class AcknowledgementStatus : uint8_t {
         ACKNOWLEDGEMENT_SUCCESS = 0x00,
         ACKNOWLEDGEMENT_ERROR_TIMEOUT = 0x01,
         ACKNOWLEDGEMENT_ERROR_NOACK = 0x02,
@@ -50,7 +50,7 @@ namespace smart_home::usp_protocol::messages {
             const size_t& size,
             std::string data
         )
-            : Message(protocolVersion, std::move(sessionId), MESSAGE_ACKNOWLEDGEMENT, timestamp)
+            : Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_ACKNOWLEDGEMENT, timestamp)
             , requestId(std::move(requestId))
             , status(status)
             , size(size)

@@ -70,60 +70,66 @@ needed to run the protocol itself.
 
 ### REQ
 
-| Field              | Type      | Size | Description                         |
-|--------------------|-----------|------|-------------------------------------|
-| Version            | uint8\_t  | 1 B  | Protocol version                    |
-| Request Session ID | uint16\_t | 2 B  | Session ID (permanent)              |
-| Type               | uint8\_t  | 1 B  | Always `REQ`                        |
-| Timestamp          | uint32\_t | 4 B  | Client timestamp                    |
-| Packets Count      | uint8\_t  | 1 B  | Total amount of request packets     |
-| Packet Index       | uint8\_t  | 1 B  | Index of packet being sent          |
-| Auth               | uint32\_t | 4 B  | Authentication token (optional)     |
-| Action Group       | uint8\_t  | 1 B  | Group (MANAGE, DEVICE, COLOR, etc.) |
-| Action             | uint8\_t  | 1 B  | Specific action                     |
-| Size               | uint16\_t | 2 B  | Payload length                      |
-| Data               | bytes     | var  | Request payload                     |
+| Field         | Type      | Size | Description                     |
+|---------------|-----------|------|---------------------------------|
+| Version       | uint8\_t  | 1 B  | Protocol version                |
+| Session ID    | uint16\_t | 2 B  | Request Session ID (permanent)  |
+| Type          | uint8\_t  | 1 B  | Always `REQ`                    |
+| Timestamp     | uint32\_t | 4 B  | Client timestamp                |
+| Packets Count | uint8\_t  | 1 B  | Total amount of request packets |
+| Packet Index  | uint8\_t  | 1 B  | Index of packet being sent      |
+| Request ID    | uint16\_t | 2 B  | Original request identifier     |
+| Auth          | uint32\_t | 4 B  | Authentication token (optional) |
+| Action Group  | uint8\_t  | 1 B  | Group (MANAGE, DEVICE, etc.)    |
+| Action        | uint8\_t  | 1 B  | Specific action                 |
+| Size          | uint16\_t | 2 B  | Payload length                  |
+| Data          | bytes     | var  | Request payload                 |
 
 ---
 
 ### RESP
 
-| Field              | Type      | Size | Description                 |
-|--------------------|-----------|------|-----------------------------|
-| Version            | uint8\_t  | 1 B  | Protocol version            |
-| Timestamp          | uint32\_t | 4 B  | Server timestamp            |
-| Request Session ID | uint16\_t | 2 B  | Session ID                  |
-| Request ID         | uint16\_t | 2 B  | Original request identifier |
-| Type               | uint8\_t  | 1 B  | Always `RESP`               |
-| Status             | uint8\_t  | 1 B  | `0x00` = OK, other = error  |
-| Size               | uint16\_t | 2 B  | Payload length              |
-| Data               | bytes     | var  | Response data               |
+| Field         | Type      | Size | Description                     |
+|---------------|-----------|------|---------------------------------|
+| Version       | uint8\_t  | 1 B  | Protocol version                |
+| Session ID    | uint16\_t | 2 B  | Request Session ID              |
+| Type          | uint8\_t  | 1 B  | Always `RESP`                   |
+| Timestamp     | uint32\_t | 4 B  | Server timestamp                |
+| Packets Count | uint8\_t  | 1 B  | Total amount of request packets |
+| Packet Index  | uint8\_t  | 1 B  | Index of packet being sent      |
+| Request ID    | uint16\_t | 2 B  | Original request identifier     |
+| Status        | uint8\_t  | 1 B  | `0x00` = OK, other = error      |
+| Size          | uint16\_t | 2 B  | Payload length                  |
+| Data          | bytes     | var  | Response data                   |
 
 ---
 
 ### ACK
 
-| Field              | Type      | Size | Description                           |
-| ------------------ | --------- | ---- | ------------------------------------- |
-| Version            | uint8\_t  | 1 B  | Protocol version                      |
-| Request Session ID | uint16\_t | 2 B  | Session ID                            |
-| Type               | uint8\_t  | 1 B  | Always `ACK`                          |
-| Status             | uint8\_t  | 1 B  | `0x00` = OK, other = error            |
-| Size               | uint16\_t | 2 B  | Payload length                        |
-| Data               | bytes     | var  | Optional metadata (e.g., new session) |
+| Field      | Type      | Size | Description                           |
+|------------|-----------|------|---------------------------------------|
+| Version    | uint8\_t  | 1 B  | Protocol version                      |
+| Session ID | uint16\_t | 2 B  | Request Session ID                    |
+| Type       | uint8\_t  | 1 B  | Always `ACK`                          |
+| Timestamp  | uint32\_t | 4 B  | Sender (client/server) timestamp      |
+| Request ID | uint16\_t | 2 B  | Original request identifier           |
+| Status     | uint8\_t  | 1 B  | `0x00` = OK, other = error            |
+| Size       | uint16\_t | 2 B  | Payload length                        |
+| Data       | bytes     | var  | Optional metadata (e.g., new session) |
 
 ---
 
 ### PROTO
 
-| Field              | Type      | Size | Description                           |
-| ------------------ | --------- | ---- | ------------------------------------- |
-| Version            | uint8\_t  | 1 B  | Protocol version                      |
-| Request Session ID | uint16\_t | 2 B  | Temporary ID (handshake) or permanent |
-| Type               | uint8\_t  | 1 B  | Always `PROTO`                        |
-| Action             | uint8\_t  | 1 B  | `HANDSHAKE`, `TERMINATE`, `HEARTBEAT` |
-| Size               | uint16\_t | 2 B  | Payload length                        |
-| Data               | bytes     | var  | Optional payload                      |
+| Field      | Type      | Size | Description                           |
+|------------|-----------|------|---------------------------------------|
+| Version    | uint8\_t  | 1 B  | Protocol version                      |
+| Session ID | uint16\_t | 2 B  | Request Session ID                    |
+| Type       | uint8\_t  | 1 B  | Always `PROTO`                        |
+| Timestamp  | uint32\_t | 4 B  | Sender (client/server) timestamp      |
+| Action     | uint8\_t  | 1 B  | `HANDSHAKE`, `TERMINATE`, `HEARTBEAT` |
+| Size       | uint16\_t | 2 B  | Payload length                        |
+| Data       | bytes     | var  | Optional payload                      |
 
 ---
 
