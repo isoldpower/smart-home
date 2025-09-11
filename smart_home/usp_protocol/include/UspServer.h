@@ -1,14 +1,13 @@
 #pragma once
 
+#include <smart_home/web_server/include/NetServer.h>
+
 #include <any>
 #include <iostream>
 
 #include "./UspServerConfig.h"
-#include "./net/NetServer.h"
 #include "./UspServerRequest.h"
 #include "./UspServerResponse.h"
-#include "./handlers/MessageHandlerBuilder.h"
-#include "./handlers/version1/MessageBasisHandler.h"
 
 
 namespace smart_home::usp_protocol {
@@ -20,58 +19,18 @@ namespace smart_home::usp_protocol {
 
     class UspServer {
     private:
-        net::NetServer netServer;
+        web_server::NetServer netServer;
         HandlerFunction handler;
 
         void handleRequestReceived(
             const char* buffer,
-            const net::NetServerClientInfo& client
-        ) {
-            std::unique_ptr<handlers::model::ProtocolBasisHandler> messageHandler =
-                        handlers::MessageBasisHandlerBuilder::buildFromVersion(buffer);
-
-            if (messageHandler) {
-                messages::CommonMessageData commonData = messageHandler->parseCommonData(
-                    buffer,
-                    client.bytesReceived
-                );
-                std::cout << "Received message with ID: " << commonData.requestId << std::endl;
-            } else {
-                std::cerr << "Failed to parse message; skipping..." << std::endl;
-            }
-        }
-
-        messages::MessageType determineProtocolVersion(const char* buffer, size_t length) const;
+            const web_server::NetServerClientInfo& client
+        );
     public:
-        explicit UspServer(const UspServerConfig& config)
-            : netServer({ config.host, config.port })
-        {}
+        explicit UspServer(const UspServerConfig& config);
 
-        void addMiddleware(const std::any& middleware) {
-            std::cerr << "USP Middlewares are not implemented yet." << std::endl;
-        }
-
-        void setHandler(const HandlerFunction& handler) {
-            this->handler = handler;
-        }
-
-        void startServer(const std::function<bool()>& isRunningSignal = []() { return true; }) {
-            netServer.establishConnection();
-
-            char* buffer = new char[messages::MessageSettings::MAX_PACKET_SIZE];
-            while (isRunningSignal()) {
-                net::NetServerClientInfo client = netServer.receiveMessage(
-                    messages::MessageSettings::MAX_PACKET_SIZE,
-                    buffer,
-                    timeval{ 1, 0 }
-                );
-
-                if (client.isSuccessful) {
-                    handleRequestReceived(buffer, client);
-                }
-            }
-
-            netServer.closeConnection();
-        }
+        void addMiddleware(const std::any& middleware);
+        void setHandler(const HandlerFunction& handler);
+        void startServer(const std::function<bool()>& isRunningSignal = []() { return true; });
     };
 } // namespace smart_home::usp_protocol

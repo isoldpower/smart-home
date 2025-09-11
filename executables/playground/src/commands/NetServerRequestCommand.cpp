@@ -1,13 +1,11 @@
 #include "../../include/commands/NetServerRequestCommand.h"
 
+#include <smart_home/web_server/include/NetServer.h>
 #include <arpa/inet.h>
-#include <smart_home/usp_protocol/include/net/NetServer.h>
 #include <unistd.h>
-
 #include <iostream>
 #include <thread>
 
-#include "messages/BinaryMessage.h"
 
 namespace smart_home::playground::commands {
 
@@ -16,7 +14,7 @@ namespace smart_home::playground::commands {
     }
 
     void NetServerRequestCommand::receiveRequest() {
-        std::array<char, messages::MessageSettings::MAX_PACKET_SIZE> buffer{};
+        std::array<char, 4096> buffer{};
         std::cout << "Listening on port " << config.port << "..." << std::endl;
         NetServerClientInfo client = activeServer.receiveMessage(
             buffer.size(),
@@ -71,7 +69,7 @@ namespace smart_home::playground::commands {
         std::cout << "[CLIENT] Sent: " << message << " to " << config.ip << ":" << config.port << std::endl;
 
         // Receive response
-        char buffer[messages::MessageSettings::MAX_PACKET_SIZE]{};
+        char buffer[4096]{};
         sockaddr_in fromAddr{};
         socklen_t fromLen = sizeof(fromAddr);
         ssize_t bytesReceived = recvfrom(

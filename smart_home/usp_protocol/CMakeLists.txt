@@ -1,22 +1,19 @@
 add_library(usp_protocol STATIC
-        src/messages/AcknowledgementMessage.cpp
-        src/messages/RequestMessage.cpp
-        src/messages/ResponseMessage.cpp
-        src/messages/ProtocolMessage.cpp
-        src/handlers/AcknowledgementMessageHandler.cpp
-        src/handlers/RequestMessageHandler.cpp
-        src/handlers/ResponseMessageHandler.cpp
-        src/handlers/ProtocolMessageHandler.cpp
-        src/net/NetServer.cpp
         src/UspServer.cpp
         src/UspServerConfig.cpp
         src/UspServerRequest.cpp
-        include/UspServerRequest.h
         src/UspServerResponse.cpp
-        include/UspServerResponse.h
-        include/handlers/MessageHandlerBuilder.h
-        include/handlers/model/ProtocolBasisHandler.h
-        include/handlers/version1/MessageBasisHandler.h
+        src/handlers/CommonMessageData.cpp
+        src/handlers/MessageBasisHandlerBuilder.cpp
+        src/handlers/version1/acknowledgement/AcknowledgementMessage.cpp
+        src/handlers/version1/acknowledgement/AcknowledgementMessageHandler.cpp
+        src/handlers/version1/request/RequestMessage.cpp
+        src/handlers/version1/request/RequestMessageHandler.cpp
+        src/handlers/version1/response/ResponseMessage.cpp
+        src/handlers/version1/response/ResponseMessageHandler.cpp
+        src/handlers/version1/protocol/ProtocolMessage.cpp
+        src/handlers/version1/protocol/ProtocolMessageHandler.cpp
+        src/handlers/version1/MessageBasisHandler.cpp
 )
 
 if (BUILD_TESTING)
@@ -27,4 +24,4 @@ if (BUILD_TESTING)
 endif()
 
 target_include_directories(usp_protocol INTERFACE include)
-target_link_libraries(usp_protocol PUBLIC utilities cxx_setup)
+target_link_libraries(usp_protocol PUBLIC utilities web_server cxx_setup)

@@ -10,7 +10,9 @@ endif()
 message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 
 # Libraries list
-add_library(cxx_setup INTERFACE smart_home/daemon smart_home/utilities smart_home/usp_protocol)
+add_library(cxx_setup INTERFACE smart_home/daemon smart_home/utilities smart_home/usp_protocol
+        smart_home/web_server/src/ExitCodes.cpp
+        smart_home/web_server/src/NetServerClientInfo.cpp)
 
 # General compiler options
 if (MSVC)

@@ -1,13 +1,12 @@
 #pragma once
 
 #include <smart_home/utilities/include/patterns/PresentableCommand.h>
+#include <smart_home/web_server/include/NetServer.h>
+#include <smart_home/web_server/include/NetServerConfig.h>
 
-#include "net/NetServer.h"
-#include "net/NetServerConfig.h"
 
 namespace smart_home::playground::commands {
-    using namespace usp_protocol;
-    using namespace usp_protocol::net;
+    using namespace smart_home::web_server;
 
     class NetServerRequestCommand : public utilities::patterns::PresentableCommand<int> {
     private:
@@ -19,7 +18,7 @@ namespace smart_home::playground::commands {
         void receiveRequest();
     public:
         NetServerRequestCommand()
-            : config({ "localhost", 12345 })
+            : config(NetServerConfig{ "localhost", 12345 })
             , activeServer(config)
         {}
         int execute() override;
