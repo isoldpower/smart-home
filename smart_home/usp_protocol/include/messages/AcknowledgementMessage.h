@@ -36,22 +36,26 @@ namespace smart_home::usp_protocol::messages {
 
     struct AcknowledgementMessage final : public model::Message {
     public:
-        std::string requestId;
         AcknowledgementStatus status;
         size_t size;
         std::string data;
 
         explicit AcknowledgementMessage(
             const ProtocolVersion& protocolVersion,
-            std::string sessionId,
+            const std::string& sessionId,
             const time_t& timestamp,
-            std::string requestId,
+            const std::string& requestId,
             const AcknowledgementStatus& status,
             const size_t& size,
             std::string data
         )
-            : Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_ACKNOWLEDGEMENT, timestamp)
-            , requestId(std::move(requestId))
+            : Message(
+                protocolVersion,
+                sessionId,
+                MessageType::MESSAGE_ACKNOWLEDGEMENT,
+                timestamp,
+                requestId
+            )
             , status(status)
             , size(size)
             , data(std::move(data))

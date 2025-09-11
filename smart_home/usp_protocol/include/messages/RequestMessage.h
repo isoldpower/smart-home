@@ -31,11 +31,37 @@ namespace smart_home::usp_protocol::messages {
 
     using RequestMessageRaw = BinaryMessageRaw<REQUEST_CHUNKS_AMOUNT>;
 
-    struct RequestMessage final : public model::Message {
+    struct RequestMessageData {
+    public:
+        std::string auth;
+        uint8_t actionGroup;
+        uint8_t action;
+        size_t size;
+        std::string data;
+
+        RequestMessageData(
+            std::string auth,
+            const uint8_t& actionGroup,
+            const uint8_t& action,
+            const size_t& size,
+            std::string data
+        )
+            : auth(std::move(auth))
+            , actionGroup(actionGroup)
+            , action(action)
+            , size(size)
+            , data(std::move(data))
+        {}
+    };
+
+    struct RequestMessage final
+        : public model::Message
+        , public RequestMessageData
+        , public PacketMessage
+    {
     public:
         size_t packetsCount;
         size_t packetIndex;
-        std::string requestId;
         std::string auth;
         uint8_t actionGroup;
         uint8_t action;
@@ -44,26 +70,32 @@ namespace smart_home::usp_protocol::messages {
 
         RequestMessage(
             const ProtocolVersion& protocolVersion,
-            std::string sessionId,
+            const std::string& sessionId,
             const time_t& timestamp,
+            const std::string& requestId,
             const size_t& packetsCount,
             const size_t& packetIndex,
-            std::string requestId,
             std::string auth,
             const uint8_t& actionGroup,
             const uint8_t& action,
             const size_t& size,
             std::string data
         )
-            : model::Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_REQUEST, timestamp)
-            , packetsCount(packetsCount)
-            , packetIndex(packetIndex)
-            , requestId(std::move(requestId))
-            , auth(std::move(auth))
-            , actionGroup(actionGroup)
-            , action(action)
-            , size(size)
-            , data(std::move(data))
+            : model::Message(
+                protocolVersion,
+                sessionId,
+                MessageType::MESSAGE_REQUEST,
+                timestamp,
+                requestId
+            )
+            , RequestMessageData(
+                std::move(auth),
+                actionGroup,
+                action,
+                size,
+                std::move(data)
+            )
+            , PacketMessage(packetsCount, packetIndex)
         {}
 
         [[nodiscard]] bool isValid() const override;

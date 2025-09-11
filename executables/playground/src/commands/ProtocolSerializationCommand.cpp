@@ -1,17 +1,16 @@
 #include "../../include/commands/ProtocolSerializationCommand.h"
 
+#include <smart_home/usp_protocol/include/handlers/version1/AcknowledgementMessageHandler.h>
+#include <smart_home/usp_protocol/include/handlers/version1/RequestMessageHandler.h>
+#include <smart_home/usp_protocol/include/handlers/version1/ResponseMessageHandler.h>
+#include <smart_home/usp_protocol/include/handlers/version1/ProtocolMessageHandler.h>
 #include <smart_home/usp_protocol/include/messages/AcknowledgementMessage.h>
 #include <smart_home/usp_protocol/include/messages/ProtocolMessage.h>
 #include <smart_home/usp_protocol/include/messages/RequestMessage.h>
 #include <smart_home/usp_protocol/include/messages/ResponseMessage.h>
-#include <smart_home/usp_protocol/include/handlers/AcknowledgementMessageHandler.h>
-#include <smart_home/usp_protocol/include/handlers/ProtocolMessageHandler.h>
-#include <smart_home/usp_protocol/include/handlers/RequestMessageHandler.h>
-#include <smart_home/usp_protocol/include/handlers/ResponseMessageHandler.h>
 
 #include <iostream>
 #include <ostream>
-
 
 namespace smart_home::playground::commands {
     using namespace usp_protocol;
@@ -50,9 +49,9 @@ namespace smart_home::playground::commands {
             protocolVersion,
             sessionId,
             timestamp,
+            requestId,
             1,
             0,
-            requestId,
             "",
             0x01,
             0x01,
@@ -71,9 +70,9 @@ namespace smart_home::playground::commands {
             protocolVersion,
             sessionId,
             timestamp,
+            requestId,
             1,
             0,
-            requestId,
             messages::ResponseStatus::STATUS_OK,
             size,
             dataToSerialize
@@ -90,6 +89,7 @@ namespace smart_home::playground::commands {
             protocolVersion,
             sessionId,
             timestamp,
+            requestId,
             messages::ProtocolAction::ACTION_HANDSHAKE,
             size,
             dataToSerialize

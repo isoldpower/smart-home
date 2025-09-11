@@ -1,13 +1,14 @@
 #include "../include/Entrypoint.h"
 
 #include <smart_home/utilities/include/patterns/PresentableCommand.h>
+
 #include <any>
 #include <iostream>
 
 #include "../include/commands/DelayedDaemonCommand.h"
+#include "../include/commands/NetServerRequestCommand.h"
 #include "../include/commands/ProtocolSerializationCommand.h"
-#include "../include/commands/UspServerRequestCommand.h"
-
+#include "../include/commands/UspServerConfigCommand.h"
 
 namespace smart_home::playground {
     using namespace smart_home::utilities::patterns;
@@ -18,10 +19,11 @@ namespace smart_home::playground {
     bool validateUserInput(const std::array<T, N>& commands, int commandIndex);
 
     int runPlaygroundEntrypoint() {
-        const std::array<PresentableCommand<int>*, 3> commands = {
+        const std::array<PresentableCommand<int>*, 4> commands = {
             new commands::DelayedDaemonCommand{},
             new commands::ProtocolSerializationCommand{},
-            new commands::UspServerRequestCommand{}
+            new commands::NetServerRequestCommand{},
+            new commands::UspServerConfigCommand{},
         };
 
         for (size_t i = 0; i < commands.size(); i++) {

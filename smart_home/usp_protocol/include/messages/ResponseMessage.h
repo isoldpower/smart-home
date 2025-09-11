@@ -36,33 +36,53 @@ namespace smart_home::usp_protocol::messages {
         STATUS_UNKNOWN = 0xFF
     };
 
-    struct ResponseMessage : public model::Message {
+    struct ResponseMessageData {
     public:
-        size_t packetsCount;
-        size_t packetIndex;
-        std::string requestId;
         ResponseStatus status;
         size_t size;
         std::string data;
 
-        explicit ResponseMessage(
-            const ProtocolVersion& protocolVersion,
-            std::string sessionId,
-            const time_t& timestamp,
-            const size_t& packetsCount,
-            const size_t& packetIndex,
-            std::string requestId,
+        explicit ResponseMessageData(
             const ResponseStatus& status,
             const size_t& size,
             std::string data
         )
-            : model::Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_REQUEST, timestamp)
-            , packetsCount(packetsCount)
-            , packetIndex(packetIndex)
-            , requestId(std::move(requestId))
-            , status(status)
+            : status(status)
             , size(size)
             , data(std::move(data))
+        {}
+    };
+
+    struct ResponseMessage
+        : public model::Message
+        , public ResponseMessageData
+        , public PacketMessage
+    {
+    public:
+        explicit ResponseMessage(
+            const ProtocolVersion& protocolVersion,
+            const std::string& sessionId,
+            const time_t& timestamp,
+            const std::string& requestId,
+            const size_t& packetsCount,
+            const size_t& packetIndex,
+            const ResponseStatus& status,
+            const size_t& size,
+            const std::string& data
+        )
+            : model::Message(
+                protocolVersion,
+                sessionId,
+                MessageType::MESSAGE_REQUEST,
+                timestamp,
+                requestId
+            )
+            , ResponseMessageData(
+                status,
+                size,
+                data
+            )
+            , PacketMessage(packetsCount, packetIndex)
         {}
 
         [[nodiscard]] bool isValid() const override;

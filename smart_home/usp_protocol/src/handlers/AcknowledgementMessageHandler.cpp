@@ -1,5 +1,4 @@
-#include "../../include/handlers/AcknowledgementMessageHandler.h"
-
+#include "../../include/handlers/version1/AcknowledgementMessageHandler.h"
 
 namespace smart_home::usp_protocol::handlers {
 

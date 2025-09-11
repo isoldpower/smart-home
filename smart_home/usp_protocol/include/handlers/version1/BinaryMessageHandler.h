@@ -1,8 +1,7 @@
 #pragma once
 
-#include "./model/ProtocolMessageHandler.h"
-#include "../messages/BinaryMessage.h"
-
+#include "../../messages/BinaryMessage.h"
+#include "../model/ProtocolMessageHandler.h"
 
 namespace smart_home::usp_protocol::handlers {
 

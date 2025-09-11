@@ -1,22 +1,28 @@
-#include "../../include/commands/UspServerRequestCommand.h"
+#include "../../include/commands/NetServerRequestCommand.h"
 
 #include <arpa/inet.h>
-#include <smart_home/usp_protocol/include/server/UspServer.h>
+#include <smart_home/usp_protocol/include/net/NetServer.h>
 #include <unistd.h>
 
 #include <iostream>
 #include <thread>
 
+#include "messages/BinaryMessage.h"
+
 namespace smart_home::playground::commands {
 
-    void UspServerRequestCommand::openRequestConnection() {
+    void NetServerRequestCommand::openRequestConnection() {
         activeServer.establishConnection();
     }
 
-    void UspServerRequestCommand::receiveRequest() {
-        std::array<char, 1024> buffer{};
+    void NetServerRequestCommand::receiveRequest() {
+        std::array<char, messages::MessageSettings::MAX_PACKET_SIZE> buffer{};
         std::cout << "Listening on port " << config.port << "..." << std::endl;
-        UspServerClientInfo client = activeServer.receiveMessage(buffer.size(), buffer.data());
+        NetServerClientInfo client = activeServer.receiveMessage(
+            buffer.size(),
+            buffer.data(),
+            timeval{ 5, 0 }
+        );
         if constexpr (!buffer.empty()) {
             std::cout << "[SERVER] Received: " << buffer.data() << std::endl;
             // Echo back to client
@@ -29,9 +35,9 @@ namespace smart_home::playground::commands {
         activeServer.closeConnection();
     }
 
-    void UspServerRequestCommand::fakeClientRequest() {
-        int sock = socket(AF_INET, SOCK_DGRAM, 0);
-        if (sock < 0) {
+    void NetServerRequestCommand::fakeClientRequest() const {
+        const int clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+        if (clientSocket < 0) {
             std::cerr << "Failed to create socket: " << strerror(errno) << std::endl;
             return;
         }
@@ -50,7 +56,7 @@ namespace smart_home::playground::commands {
         // Send message
         const char* message = "Hello, world from fake client!";
         ssize_t bytesSent = sendto(
-            sock,
+            clientSocket,
             message,
             strlen(message),
             0,
@@ -59,17 +65,17 @@ namespace smart_home::playground::commands {
         );
         if (bytesSent < 0) {
             std::cerr << "Failed to send message: " << strerror(errno) << std::endl;
-            close(sock);
+            close(clientSocket);
             return;
         }
         std::cout << "[CLIENT] Sent: " << message << " to " << config.ip << ":" << config.port << std::endl;
 
         // Receive response
-        char buffer[1024]{};
+        char buffer[messages::MessageSettings::MAX_PACKET_SIZE]{};
         sockaddr_in fromAddr{};
         socklen_t fromLen = sizeof(fromAddr);
         ssize_t bytesReceived = recvfrom(
-            sock,
+            clientSocket,
             buffer,
             sizeof(buffer) - 1,
             0,
@@ -85,12 +91,12 @@ namespace smart_home::playground::commands {
                       << ntohs(fromAddr.sin_port) << std::endl;
         }
 
-        close(sock);
+        close(clientSocket);
     }
 
-    int UspServerRequestCommand::execute() {
+    int NetServerRequestCommand::execute() {
         openRequestConnection();
-        std::thread serverThread(&UspServerRequestCommand::receiveRequest, this);
+        std::thread serverThread(&NetServerRequestCommand::receiveRequest, this);
 
         fakeClientRequest();
 
@@ -98,7 +104,7 @@ namespace smart_home::playground::commands {
         return 0;
     }
 
-    void UspServerRequestCommand::present() const {
+    void NetServerRequestCommand::present() const {
         std::cout << "USP Network Requests: "
                      "Runs USP server instance and waits for network requests..." << std::endl;
     }

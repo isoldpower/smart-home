@@ -1,10 +1,9 @@
 #pragma once
 \
-#include "./BinaryMessageHandler.h"
-#include "./model/Deserialization.h"
-#include "./model/Serialization.h"
-#include "../messages/ProtocolMessage.h"
-
+#include "BinaryMessageHandler.h"
+#include "../../messages/ProtocolMessage.h"
+#include "../model/Deserialization.h"
+#include "../model/Serialization.h"
 
 namespace smart_home::usp_protocol::handlers {
 

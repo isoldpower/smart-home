@@ -7,10 +7,16 @@ add_library(usp_protocol STATIC
         src/handlers/RequestMessageHandler.cpp
         src/handlers/ResponseMessageHandler.cpp
         src/handlers/ProtocolMessageHandler.cpp
+        src/net/NetServer.cpp
         src/UspServer.cpp
-        include/server/UspServerConfig.h
-        include/server/ExitCodes.h
-        include/server/UspServerClientInfo.h
+        src/UspServerConfig.cpp
+        src/UspServerRequest.cpp
+        include/UspServerRequest.h
+        src/UspServerResponse.cpp
+        include/UspServerResponse.h
+        include/handlers/MessageHandlerBuilder.h
+        include/handlers/model/ProtocolBasisHandler.h
+        include/handlers/version1/MessageBasisHandler.h
 )
 
 if (BUILD_TESTING)

@@ -41,13 +41,20 @@ namespace smart_home::usp_protocol::messages {
 
         ProtocolMessage(
             const ProtocolVersion& protocolVersion,
-            std::string sessionId,
+            const std::string& sessionId,
             const time_t& timestamp,
+            const std::string& requestId,
             const ProtocolAction& action,
             const size_t& size,
             std::string data
         )
-            : model::Message(protocolVersion, std::move(sessionId), MessageType::MESSAGE_PROTOCOL, timestamp)
+            : model::Message(
+                protocolVersion,
+                sessionId,
+                MessageType::MESSAGE_PROTOCOL,
+                timestamp,
+                requestId
+            )
             , action(action)
             , size(size)
             , data(std::move(data))

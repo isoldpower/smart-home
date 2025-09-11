@@ -19,23 +19,42 @@ namespace smart_home::usp_protocol::messages {
         MESSAGE_UNKNOWN = 0xFF,
     };
 
+    struct PacketMessage {
+    public:
+        size_t packetsCount;
+        size_t packetIndex;
+
+        PacketMessage(
+            const size_t& packetsCount,
+            const size_t& packetIndex
+        )
+            : packetsCount(packetsCount)
+            , packetIndex(packetIndex)
+        {}
+    };
+
     struct CommonMessageData {
     public:
         ProtocolVersion protocolVersion;
         std::string sessionId;
         MessageType type;
         std::time_t timestamp;
+        std::string requestId;
 
         CommonMessageData(
             const ProtocolVersion& protocolVersion,
             std::string sessionId,
             const MessageType& messageType,
-            const time_t& timestamp
+            const time_t& timestamp,
+            std::string requestId
         )
             : protocolVersion(protocolVersion)
             , sessionId(std::move(sessionId))
             , type(messageType)
             , timestamp(timestamp)
+            , requestId(std::move(requestId))
         {}
     };
+
+
 } // namespace smart_home::usp_protocol::messages

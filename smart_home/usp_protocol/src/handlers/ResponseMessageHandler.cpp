@@ -1,5 +1,4 @@
-#include "../../include/handlers/ResponseMessageHandler.h"
-
+#include "../../include/handlers/version1/ResponseMessageHandler.h"
 
 namespace smart_home::usp_protocol::handlers {
 
@@ -21,9 +20,9 @@ namespace smart_home::usp_protocol::handlers {
             messages::ProtocolVersion::VERSION_1,
             "sessionId",
             time(nullptr),
+            "requestId",
             1,
             0,
-            "requestId",
             messages::ResponseStatus::STATUS_OK,
             strlen(buffer->at(0)),
             buffer->at(0)

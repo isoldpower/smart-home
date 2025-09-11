@@ -1,4 +1,4 @@
-#include "../include/UspServer.h"
+#include "../include/UspServerConfig.h"
 
 
 namespace smart_home::usp_protocol {

@@ -19,13 +19,15 @@ namespace smart_home::usp_protocol::messages::model {
             const ProtocolVersion& protocolVersion,
             std::string sessionId,
             const MessageType& messageType,
-            const time_t& timestamp
+            const time_t& timestamp,
+            std::string requestId
         )
             : CommonMessageData(
                 protocolVersion,
                 std::move(sessionId),
                 messageType,
-                timestamp
+                timestamp,
+                std::move(requestId)
             )
         {}
     };

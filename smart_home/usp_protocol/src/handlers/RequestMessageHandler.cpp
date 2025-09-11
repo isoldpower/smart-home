@@ -1,5 +1,4 @@
-#include "../../include/handlers/RequestMessageHandler.h"
-
+#include "../../include/handlers/version1/RequestMessageHandler.h"
 
 namespace smart_home::usp_protocol::handlers {
 
@@ -21,9 +20,9 @@ namespace smart_home::usp_protocol::handlers {
             messages::ProtocolVersion::VERSION_1,
             "sessionId",
             time(nullptr),
+            "requestId",
             1,
             0,
-            "requestId",
             "",
             0x01,
             0x01,
