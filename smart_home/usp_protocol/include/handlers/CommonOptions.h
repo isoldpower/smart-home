@@ -18,6 +18,7 @@ namespace smart_home::usp_protocol::handlers {
     };
 
     enum MessageSettings : unsigned int {
-        MAX_PACKET_SIZE = 4096
+        MAX_PACKET_SIZE = 4096,
+        MIN_PACKET_SIZE = 10,
     };
 } // namespace smart_home::usp_protocol::handlers

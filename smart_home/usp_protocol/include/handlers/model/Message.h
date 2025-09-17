@@ -16,17 +16,17 @@ namespace smart_home::usp_protocol::handlers::model {
     {
         explicit Message(
             const ProtocolVersion& protocolVersion,
-            std::string sessionId,
+            const uint16_t& sessionId,
             const MessageType& messageType,
             const time_t& timestamp,
-            std::string requestId
+            const uint16_t& requestId
         )
             : CommonMessageData(
                 protocolVersion,
-                std::move(sessionId),
+                sessionId,
                 messageType,
                 timestamp,
-                std::move(requestId)
+                requestId
             )
         {}
     };

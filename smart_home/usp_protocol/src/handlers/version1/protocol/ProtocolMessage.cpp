@@ -5,9 +5,9 @@ namespace smart_home::usp_protocol::handlers::version1 {
 
     ProtocolMessage::ProtocolMessage(
         const ProtocolVersion& protocolVersion,
-        const std::string& sessionId,
+        const uint16_t& sessionId,
         const time_t& timestamp,
-        const std::string& requestId,
+        const uint16_t& requestId,
         const ProtocolAction& action,
         const size_t& size,
         std::string data

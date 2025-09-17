@@ -7,26 +7,33 @@ namespace smart_home::usp_protocol::handlers::version1 {
         ResponseMessageHandler::serialize(ResponseMessage* message)
     {
         // TODO: Implement proper serialization logic
-        ResponseMessageRaw resultBuffer { "Response Example" };
-        ResponseSerializationResult result { true, message, resultBuffer };
+        char resultBuffer[] = "Response Example";
+        ResponseSerializationResult result {
+            true,
+            message,
+            std::vector(
+                resultBuffer,
+                resultBuffer + sizeof(resultBuffer) / sizeof(char)
+            )
+        };
 
         return std::make_unique<ResponseSerializationResult>(result);
     }
 
     std::unique_ptr<ResponseDeserializationResult>
-        ResponseMessageHandler::deserialize(ResponseMessageRaw* buffer)
+        ResponseMessageHandler::deserialize(std::vector<char>* buffer)
     {
         // TODO: Implement proper deserialization logic
         ResponseMessage resultMessage {
             ProtocolVersion::VERSION_1,
-            "sessionId",
+            8823,
             time(nullptr),
-            "requestId",
+            22233,
             1,
             0,
             ResponseStatus::STATUS_OK,
-            strlen(buffer->at(0)),
-            buffer->at(0)
+            buffer->size(),
+            buffer->data()
         };
         model::DeserializationResult result { true, buffer, resultMessage };
 

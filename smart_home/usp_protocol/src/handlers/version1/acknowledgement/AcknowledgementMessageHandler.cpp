@@ -7,24 +7,31 @@ namespace smart_home::usp_protocol::handlers::version1 {
         AcknowledgementMessageHandler::serialize(AcknowledgementMessage* message)
     {
         // TODO: Implement actual serialization logic
-        AcknowledgementMessageRaw resultBuffer { "Acknowledgement Example" };
-        AcknowledgementSerializationResult result { true, message, resultBuffer };
+        char resultBuffer[] = "Acknowledgement Example";
+        AcknowledgementSerializationResult result {
+            true,
+            message,
+            std::vector(
+                resultBuffer,
+                resultBuffer + sizeof(resultBuffer) / sizeof(char)
+            )
+        };
 
         return std::make_unique<AcknowledgementSerializationResult>(result);
     }
 
     std::unique_ptr<AcknowledgementDeserializationResult>
-        AcknowledgementMessageHandler::deserialize(AcknowledgementMessageRaw* buffer)
+        AcknowledgementMessageHandler::deserialize(std::vector<char>* buffer)
     {
         // TODO: Implement actual deserialization logic
         AcknowledgementMessage resultMessage {
             ProtocolVersion::VERSION_1,
-            "sessionId",
+            1234,
             time(nullptr),
-            "requestId",
+            3323,
             AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
-            strlen(buffer->at(0)),
-            buffer->at(0)
+            buffer->size(),
+            buffer->data()
         };
         model::DeserializationResult result { true, buffer, resultMessage };
 

@@ -1,14 +1,13 @@
 #pragma once
 
 #include "../model/ProtocolMessageHandler.h"
-#include "BinaryMessage.h"
 
 
 namespace smart_home::usp_protocol::handlers::version1 {
 
-    template <typename MessageType, size_t ChunksAmount>
+    template <typename MessageType>
     class BinaryMessageHandler
-        : public model::ProtocolMessageHandler<BinaryMessageRaw<ChunksAmount>, MessageType>
+        : public model::ProtocolMessageHandler<std::vector<char>, MessageType>
     {};
 
 } // namespace smart_home::usp_protocol::handlers::version1

@@ -14,6 +14,8 @@ add_library(usp_protocol STATIC
         src/handlers/version1/protocol/ProtocolMessage.cpp
         src/handlers/version1/protocol/ProtocolMessageHandler.cpp
         src/handlers/version1/MessageBasisHandler.cpp
+        src/packets/SequencedPacketPoller.cpp
+        src/handlers/MessageUnion.cpp
 )
 
 if (BUILD_TESTING)

@@ -30,9 +30,9 @@ namespace smart_home::playground::commands {
         // Acknowledgement requests serialization/deserialization
         handlers::version1::AcknowledgementMessage ackMessage {
             protocolVersion,
-            sessionId,
+            22233,
             timestamp,
-            requestId,
+            22233,
             handlers::version1::AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
             size,
             dataToSerialize
@@ -47,9 +47,9 @@ namespace smart_home::playground::commands {
         // Request requests serialization/deserialization
         handlers::version1::RequestMessage reqMessage {
             protocolVersion,
-            sessionId,
+            22233,
             timestamp,
-            requestId,
+            22233,
             1,
             0,
             "",
@@ -68,9 +68,9 @@ namespace smart_home::playground::commands {
         // Response requests serialization/deserialization
         handlers::version1::ResponseMessage respMessage {
             protocolVersion,
-            sessionId,
+            22233,
             timestamp,
-            requestId,
+            22233,
             1,
             0,
             handlers::version1::ResponseStatus::STATUS_OK,
@@ -87,9 +87,9 @@ namespace smart_home::playground::commands {
         // Protocol requests serialization/deserialization
         handlers::version1::ProtocolMessage protoMessage {
             protocolVersion,
-            sessionId,
+            22233,
             timestamp,
-            requestId,
+            22233,
             handlers::version1::ProtocolAction::ACTION_HANDSHAKE,
             size,
             dataToSerialize

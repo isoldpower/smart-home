@@ -73,12 +73,12 @@ needed to run the protocol itself.
 | Field         | Type      | Size | Description                     |
 |---------------|-----------|------|---------------------------------|
 | Version       | uint8\_t  | 1 B  | Protocol version                |
-| Session ID    | uint16\_t | 2 B  | Request Session ID (permanent)  |
 | Type          | uint8\_t  | 1 B  | Always `REQ`                    |
+| Session ID    | uint16\_t | 2 B  | Request Session ID (permanent)  |
+| Request ID    | uint16\_t | 2 B  | Original request identifier     |
 | Timestamp     | uint32\_t | 4 B  | Client timestamp                |
 | Packets Count | uint8\_t  | 1 B  | Total amount of request packets |
 | Packet Index  | uint8\_t  | 1 B  | Index of packet being sent      |
-| Request ID    | uint16\_t | 2 B  | Original request identifier     |
 | Auth          | uint32\_t | 4 B  | Authentication token (optional) |
 | Action Group  | uint8\_t  | 1 B  | Group (MANAGE, DEVICE, etc.)    |
 | Action        | uint8\_t  | 1 B  | Specific action                 |
@@ -92,12 +92,12 @@ needed to run the protocol itself.
 | Field         | Type      | Size | Description                     |
 |---------------|-----------|------|---------------------------------|
 | Version       | uint8\_t  | 1 B  | Protocol version                |
-| Session ID    | uint16\_t | 2 B  | Request Session ID              |
 | Type          | uint8\_t  | 1 B  | Always `RESP`                   |
+| Session ID    | uint16\_t | 2 B  | Request Session ID              |
+| Request ID    | uint16\_t | 2 B  | Original request identifier     |
 | Timestamp     | uint32\_t | 4 B  | Server timestamp                |
 | Packets Count | uint8\_t  | 1 B  | Total amount of request packets |
 | Packet Index  | uint8\_t  | 1 B  | Index of packet being sent      |
-| Request ID    | uint16\_t | 2 B  | Original request identifier     |
 | Status        | uint8\_t  | 1 B  | `0x00` = OK, other = error      |
 | Size          | uint16\_t | 2 B  | Payload length                  |
 | Data          | bytes     | var  | Response data                   |
@@ -109,10 +109,10 @@ needed to run the protocol itself.
 | Field      | Type      | Size | Description                           |
 |------------|-----------|------|---------------------------------------|
 | Version    | uint8\_t  | 1 B  | Protocol version                      |
-| Session ID | uint16\_t | 2 B  | Request Session ID                    |
 | Type       | uint8\_t  | 1 B  | Always `ACK`                          |
-| Timestamp  | uint32\_t | 4 B  | Sender (client/server) timestamp      |
+| Session ID | uint16\_t | 2 B  | Request Session ID                    |
 | Request ID | uint16\_t | 2 B  | Original request identifier           |
+| Timestamp  | uint32\_t | 4 B  | Sender (client/server) timestamp      |
 | Status     | uint8\_t  | 1 B  | `0x00` = OK, other = error            |
 | Size       | uint16\_t | 2 B  | Payload length                        |
 | Data       | bytes     | var  | Optional metadata (e.g., new session) |
@@ -124,8 +124,9 @@ needed to run the protocol itself.
 | Field      | Type      | Size | Description                           |
 |------------|-----------|------|---------------------------------------|
 | Version    | uint8\_t  | 1 B  | Protocol version                      |
-| Session ID | uint16\_t | 2 B  | Request Session ID                    |
 | Type       | uint8\_t  | 1 B  | Always `PROTO`                        |
+| Session ID | uint16\_t | 2 B  | Request Session ID                    |
+| Request ID | uint16\_t | 2 B  | Original request identifier           |
 | Timestamp  | uint32\_t | 4 B  | Sender (client/server) timestamp      |
 | Action     | uint8\_t  | 1 B  | `HANDSHAKE`, `TERMINATE`, `HEARTBEAT` |
 | Size       | uint16\_t | 2 B  | Payload length                        |

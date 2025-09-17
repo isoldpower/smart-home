@@ -1,9 +1,17 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 
 namespace smart_home::usp_protocol::handlers::model {
+
+    template <typename TSerialized>
+    concept SerializedType =
+        std::ranges::range<TSerialized>
+        && requires (TSerialized serialized) {
+            { serialized.at(0) } -> std::convertible_to<std::string>;
+        };
 
     template <typename TMessage, typename TSerialized>
     struct SerializationResult {

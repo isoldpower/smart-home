@@ -5,10 +5,10 @@ namespace smart_home::usp_protocol {
 
     UspServerRequest::UspServerRequest(
         const handlers::ProtocolVersion& protocolVersion,
-        const std::string& sessionId,
+        const uint16_t& sessionId,
         const handlers::MessageType& messageType,
         const time_t& timestamp,
-        const std::string& requestId,
+        const uint16_t& requestId,
         const std::string& auth,
         const uint8_t& actionGroup,
         const uint8_t& action,

@@ -55,9 +55,9 @@ namespace smart_home::usp_protocol::handlers::version1 {
     public:
         RequestMessage(
             const ProtocolVersion& protocolVersion,
-            const std::string& sessionId,
+            const uint16_t& sessionId,
             const time_t& timestamp,
-            const std::string& requestId,
+            const uint16_t& requestId,
             const size_t& packetsCount,
             const size_t& packetIndex,
             std::string auth,

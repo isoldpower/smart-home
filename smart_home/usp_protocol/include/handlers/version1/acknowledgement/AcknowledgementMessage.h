@@ -43,12 +43,12 @@ namespace smart_home::usp_protocol::handlers::version1 {
 
         explicit AcknowledgementMessage(
             const ProtocolVersion& protocolVersion,
-            const std::string& sessionId,
+            const uint16_t& sessionId,
             const time_t& timestamp,
-            const std::string& requestId,
+            const uint16_t& requestId,
             const AcknowledgementStatus& status,
-            const size_t& size,
-            std::string data
+            const size_t& size = 0,
+            std::string data = ""
         );
 
         [[nodiscard]] bool isValid() const override;

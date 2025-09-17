@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "../../model/Deserialization.h"
 #include "../../model/Serialization.h"
 #include "../BinaryMessageHandler.h"
@@ -10,21 +12,21 @@ namespace smart_home::usp_protocol::handlers::version1 {
 
     using RequestSerializationResult = model::SerializationResult<
         RequestMessage,
-        RequestMessageRaw
+        std::vector<char>
     >;
     using RequestDeserializationResult = model::DeserializationResult<
         RequestMessage,
-        RequestMessageRaw
+        std::vector<char>
     >;
 
     class RequestMessageHandler final
-        : public BinaryMessageHandler<RequestMessage, REQUEST_CHUNKS_AMOUNT>
+        : public BinaryMessageHandler<RequestMessage>
     {
     public:
         std::unique_ptr<RequestSerializationResult>
             serialize(RequestMessage*) override;
 
         std::unique_ptr<RequestDeserializationResult>
-            deserialize(RequestMessageRaw*) override;
+            deserialize(std::vector<char>*) override;
     };
 } // namespace smart_home::usp_protocol::handlers::version1

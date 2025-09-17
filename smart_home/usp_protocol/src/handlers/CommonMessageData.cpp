@@ -13,15 +13,37 @@ namespace smart_home::usp_protocol::handlers {
 
     CommonMessageData::CommonMessageData(
         const ProtocolVersion& protocolVersion,
-        std::string sessionId,
+        const uint16_t& sessionId,
         const MessageType& messageType,
         const time_t& timestamp,
-        std::string requestId
+        const uint16_t& requestId
     )
         : protocolVersion(protocolVersion)
-        , sessionId(std::move(sessionId))
+        , sessionId(sessionId)
         , type(messageType)
         , timestamp(timestamp)
-        , requestId(std::move(requestId))
+        , requestId(requestId)
+    {}
+
+    CommonPacketMessageData::CommonPacketMessageData(
+        const ProtocolVersion& protocolVersion,
+        const uint16_t& sessionId,
+        const MessageType& messageType,
+        const time_t& timestamp,
+        const uint16_t& requestId,
+        const size_t& packetsCount,
+        const size_t& packetIndex
+    )
+        : CommonMessageData(
+            protocolVersion,
+            sessionId,
+            messageType,
+            timestamp,
+            requestId
+        )
+        , PacketMessage(
+            packetsCount,
+            packetIndex
+        )
     {}
 } // namespace smart_home::usp_protocol::handlers
