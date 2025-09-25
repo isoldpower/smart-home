@@ -1,26 +1,26 @@
 #include "../../include/commands/UspServerConfigCommand.h"
 
-#include <smart_home/usp_protocol/include/UspServer.h>
-#include <smart_home/usp_protocol/include/UspServerRequest.h>
-#include <smart_home/usp_protocol/include/UspServerResponse.h>
+#include <smart_home/usp_server/include/UspServer.h>
+#include <smart_home/usp_server/include/UspServerRequest.h>
+#include <smart_home/usp_server/include/UspServerResponse.h>
+#include <smart_home/daemon/include/Daemon.h>
+#include <smart_home/daemon/include/SignalDaemon.h>
+#include <smart_home/utilities/include/TypesHelper.h>
 
 #include <iostream>
 
-#include "Daemon.h"
-#include "SignalDaemon.h"
-#include "TypesHelper.h"
 
 namespace smart_home::playground::commands {
 
     void handleRootEndpoint(
-        const usp_protocol::UspServerRequest& req,
-        usp_protocol::UspServerResponse& res
+        const usp_server::UspServerRequest& req,
+        usp_server::UspServerResponse& res
     ) {
         std::cout << "Handling request to root endpoint..." << std::endl;
     }
 
     int UspServerConfigCommand::execute() {
-        usp_protocol::UspServer uspServer({
+        usp_server::UspServer uspServer({
             "localhost",
             12345
         });

@@ -1,5 +1,6 @@
 add_library(utilities STATIC
-        src/placeholder.cpp)
+        src/placeholder.cpp
+        include/BinaryReader.h)
 
 if (BUILD_TESTING)
     add_executable(utilities_tests tests/main.cpp)

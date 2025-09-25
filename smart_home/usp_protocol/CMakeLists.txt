@@ -1,22 +1,17 @@
 add_library(usp_protocol STATIC
-        src/UspServer.cpp
-        src/UspServerConfig.cpp
-        src/UspServerRequest.cpp
-        src/UspServerResponse.cpp
-        src/handlers/CommonMessageData.cpp
-        src/handlers/MessageBasisHandlerBuilder.cpp
-        src/handlers/version1/acknowledgement/AcknowledgementMessage.cpp
-        src/handlers/version1/acknowledgement/AcknowledgementMessageHandler.cpp
-        src/handlers/version1/request/RequestMessage.cpp
-        src/handlers/version1/request/RequestMessageHandler.cpp
-        src/handlers/version1/response/ResponseMessage.cpp
-        src/handlers/version1/response/ResponseMessageHandler.cpp
-        src/handlers/version1/protocol/ProtocolMessage.cpp
-        src/handlers/version1/protocol/ProtocolMessageHandler.cpp
-        src/handlers/version1/MessageBasisHandler.cpp
-        src/packets/SequencedPacketPoller.cpp
-        src/handlers/MessageUnion.cpp
-)
+        src/CommonMessageData.cpp
+        src/MessageHandlerBuilder.cpp
+        src/MessageUnion.cpp
+        src/version1/acknowledgement/AcknowledgementMessage.cpp
+        src/version1/acknowledgement/AcknowledgementMessageHandler.cpp
+        src/version1/request/RequestMessage.cpp
+        src/version1/request/RequestMessageHandler.cpp
+        src/version1/response/ResponseMessage.cpp
+        src/version1/response/ResponseMessageHandler.cpp
+        src/version1/protocol/ProtocolMessage.cpp
+        src/version1/protocol/ProtocolMessageHandler.cpp
+        src/version1/MessageBasisHandler.cpp
+        src/version1/ProtocolVersion1.cpp)
 
 if (BUILD_TESTING)
     add_executable(usp_protocol_tests tests/main.cpp)

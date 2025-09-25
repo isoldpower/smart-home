@@ -13,7 +13,9 @@ message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 add_library(cxx_setup INTERFACE
         smart_home/daemon
         smart_home/utilities
-        smart_home/usp_protocol)
+        smart_home/usp_protocol
+        smart_home/web_server
+        smart_home/usp_server)
 
 # General compiler options
 if (MSVC)
