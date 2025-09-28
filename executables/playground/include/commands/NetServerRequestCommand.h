@@ -21,7 +21,7 @@ namespace smart_home::playground::commands {
             : config(NetServerConfig{ "localhost", 12345 })
             , activeServer(config)
         {}
-        int execute() override;
+        int execute(int argc, char* argv[]) override;
         void present() const override;
     };
 } // namespace smart_home::usp_protocol::commands

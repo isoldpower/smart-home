@@ -26,6 +26,11 @@ namespace smart_home::usp_protocol::version1 {
         uint8_t determineStatus(const char* buffer, size_t length) const;
         uint8_t determineSize(const char* buffer, size_t length) const;
         char* parseDataPointer(const char* buffer, size_t length) const;
+
+        void appendBasis(std::vector<char>* buffer, const CommonMessageData& data) const;
+        void appendStatus(std::vector<char>* buffer, const AcknowledgementStatus& status) const;
+        void appendSize(std::vector<char>* buffer, uint8_t size) const;
+        void appendData(std::vector<char>* buffer, const std::string& data) const;
     public:
         std::unique_ptr<AcknowledgementSerializationResult>
             serialize(AcknowledgementMessage*) override;

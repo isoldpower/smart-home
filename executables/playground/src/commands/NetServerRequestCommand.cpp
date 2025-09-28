@@ -92,7 +92,7 @@ namespace smart_home::playground::commands {
         close(clientSocket);
     }
 
-    int NetServerRequestCommand::execute() {
+    int NetServerRequestCommand::execute(int argc, char* argv[]) {
         openRequestConnection();
         std::thread serverThread(&NetServerRequestCommand::receiveRequest, this);
 

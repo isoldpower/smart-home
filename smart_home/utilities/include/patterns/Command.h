@@ -5,7 +5,7 @@ namespace smart_home::utilities::patterns {
     template <typename T = void>
     class Command {
     public:
-        virtual T execute() = 0;
+        virtual T execute(int argc, char* argv[]) = 0;
         virtual ~Command() = default;
     };
 }

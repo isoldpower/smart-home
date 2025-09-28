@@ -1,7 +1,6 @@
 #include "../include/Entrypoint.h"
 
 #include <smart_home/utilities/include/patterns/PresentableCommand.h>
-
 #include <any>
 #include <iostream>
 
@@ -9,6 +8,8 @@
 #include "../include/commands/NetServerRequestCommand.h"
 #include "../include/commands/ProtocolSerializationCommand.h"
 #include "../include/commands/UspServerConfigCommand.h"
+#include "../include/commands/UspClientRequestCommand.h"
+
 
 namespace smart_home::playground {
     using namespace smart_home::utilities::patterns;
@@ -18,12 +19,13 @@ namespace smart_home::playground {
     template <typename T, size_t N>
     bool validateUserInput(const std::array<T, N>& commands, int commandIndex);
 
-    int runPlaygroundEntrypoint() {
-        const std::array<PresentableCommand<int>*, 4> commands = {
+    int runPlaygroundEntrypoint(int argc, char* argv[]) {
+        const std::array<PresentableCommand<int>*, 5> commands = {
             new commands::DelayedDaemonCommand{},
             new commands::ProtocolSerializationCommand{},
             new commands::NetServerRequestCommand{},
             new commands::UspServerConfigCommand{},
+            new commands::UspClientRequestCommand{}
         };
 
         for (size_t i = 0; i < commands.size(); i++) {
@@ -33,7 +35,7 @@ namespace smart_home::playground {
 
         int commandIndex = readUserInput();
         if (validateUserInput(commands, commandIndex)) {
-            int result = commands[commandIndex]->execute();
+            int result = commands[commandIndex]->execute(argc, argv);
             for (const auto& cmd : commands) {
                 delete cmd;
             }

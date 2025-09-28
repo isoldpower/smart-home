@@ -1,6 +1,6 @@
 #include "./include/Entrypoint.h"
 
 
-int main() {
-    return smart_home::playground::runPlaygroundEntrypoint();
+int main(int argc, char* argv[]) {
+    return smart_home::playground::runPlaygroundEntrypoint(argc, argv);
 }

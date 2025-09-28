@@ -22,8 +22,12 @@ namespace smart_home::usp_protocol::version1 {
         SIZE_BYTE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 2,
         DATA_START = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 3,
 
-        internal_SegmentsCount = 8
+        internal_SegmentsCount = 8,
     };
+
+    inline size_t getAcknowledgementSegmentIndex(AcknowledgementSegmentsIndex index) {
+        return static_cast<size_t>(index);
+    }
 
     inline constexpr int ACKNOWLEDGEMENT_CHUNKS_AMOUNT = static_cast<size_t>(
         AcknowledgementSegmentsIndex::internal_SegmentsCount

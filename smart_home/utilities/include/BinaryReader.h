@@ -54,6 +54,45 @@ namespace smart_home::utilities {
         static uint64_t bytesToUint64(const char bytes[8]) {
             return bytesToUint<uint64_t>(bytes, 8);
         }
+
+        template <UintDerivative T>
+        static std::unique_ptr<char[]> uintToBytes(T value, const size_t length) {
+            constexpr size_t expectedLength = sizeof(T);
+            if (length < expectedLength) {
+                throw std::invalid_argument(
+                    "Insufficient bytes for conversion to " +
+                    std::string(typeid(T).name()) +
+                    "; expected " + std::to_string(expectedLength) +
+                    ", got " + std::to_string(length));
+            }
+
+            auto bytes = std::make_unique<char[]>(length);
+            for (size_t i = 0; i < length; ++i) {
+                // Store bytes in big-endian order. We extract the least significant byte first
+                // and place it at the end of the array, moving backwards.
+                bytes[length - 1 - i] = static_cast<char>(value & 0xFF);
+                value >>= 8;
+            }
+
+            return bytes;
+        }
+
+        // Helper functions for specific sizes
+        static std::unique_ptr<char[]> uint8ToBytes(const uint8_t value) {
+            return uintToBytes(value, 1);
+        }
+
+        static std::unique_ptr<char[]> uint16ToBytes(const uint16_t value) {
+            return uintToBytes(value, 2);
+        }
+
+        static std::unique_ptr<char[]> uint32ToBytes(const uint32_t value) {
+            return uintToBytes(value, 4);
+        }
+
+        static std::unique_ptr<char[]> uint64ToBytes(const uint64_t value) {
+            return uintToBytes(value, 8);
+        }
     };
 
 } // namespace smart_home::utilities

@@ -19,7 +19,7 @@ namespace smart_home::playground::commands {
         std::cout << "Handling request to root endpoint..." << std::endl;
     }
 
-    int UspServerConfigCommand::execute() {
+    int UspServerConfigCommand::execute(int argc, char* argv[]) {
         usp_server::UspServer uspServer({
             "localhost",
             12345

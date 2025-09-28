@@ -6,7 +6,7 @@ namespace smart_home::playground::commands {
 
     class UspServerConfigCommand : public utilities::patterns::PresentableCommand<int> {
     public:
-        int execute() override;
+        int execute(int argc, char* argv[]) override;
         void present() const override;
     };
 } // namespace smart_home::playground::commands
