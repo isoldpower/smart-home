@@ -72,13 +72,8 @@ namespace smart_home::usp_server {
 
         switch (messageUnion.type) {
             case MessageType::MESSAGE_REQUEST: {
-                char readableTime[20];
-                time_t time = messageUnion.messageVariants.requestMessage->timestamp;
-                strftime(readableTime, 20, "%Y-%m-%d %H:%M:%S", localtime(&time));
                 std::cout << "Received REQUEST message (ID: "
                     << messageUnion.messageVariants.requestMessage->requestId
-                    << ", Time: "
-                    << readableTime
                     << ")" << std::endl;
                 // TODO: process request message
                 break;

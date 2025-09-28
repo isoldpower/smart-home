@@ -8,18 +8,25 @@ namespace smart_home::usp_protocol::version1 {
     std::unique_ptr<ProtocolSerializationResult>
         ProtocolMessageHandler::serialize(ProtocolMessage* message)
     {
-        // TODO: Implement proper serialization logic
-        char resultBuffer[] = "Protocol Example";
-        ProtocolSerializationResult result {
-            true,
-            message,
-            std::vector(
-                resultBuffer,
-                resultBuffer + sizeof(resultBuffer) / sizeof(char)
-            )
-        };
+        std::vector<char> resultBuffer{};
+        constexpr size_t dataStartIndex = getProtocolSegmentIndex(
+            ProtocolSegmentsIndex::DATA_START
+        );
+        constexpr size_t nullTerminatorSize = 1;
+        const size_t finalSize = dataStartIndex + message->data.size() + nullTerminatorSize;
+        resultBuffer.reserve(finalSize);
 
-        return std::make_unique<ProtocolSerializationResult>(result);
+        appendBasis(&resultBuffer, *message);
+        appendAction(&resultBuffer, message->action);
+        appendSize(&resultBuffer, message->size);
+        appendData(&resultBuffer, message->data);
+
+        return std::make_unique<ProtocolSerializationResult>(
+            ProtocolSerializationResult{
+                true,
+                message,
+                resultBuffer
+        });
     }
 
     std::unique_ptr<ProtocolDeserializationResult>
@@ -80,5 +87,43 @@ namespace smart_home::usp_protocol::version1 {
         } else {
             return const_cast<char*>(buffer + dataIndex);
         }
+    }
+
+    void ProtocolMessageHandler::appendAction(
+        std::vector<char>* buffer,
+        ProtocolAction action
+    ) const {
+        constexpr auto actionIndex = static_cast<size_t>(
+            ProtocolSegmentsIndex::ACTION_BYTE
+        );
+        const std::unique_ptr<char[]> actionValue = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<size_t>(action)
+        );
+
+        appendMultiByteField(buffer, actionIndex, 1, actionValue.get());
+    }
+
+    void ProtocolMessageHandler::appendSize(
+        std::vector<char>* buffer,
+        const uint8_t size
+    ) const {
+        constexpr size_t sizeByte = getProtocolSegmentIndex(
+            ProtocolSegmentsIndex::SIZE_BYTE
+        );
+        const std::unique_ptr<char[]> valueByte = utilities::BigEndianReader::uint8ToBytes(size);
+        appendMultiByteField(buffer, sizeByte, 1, valueByte.get());
+    }
+
+    void ProtocolMessageHandler::appendData(
+        std::vector<char>* buffer,
+        const std::string& data
+    ) const {
+        constexpr size_t dataStartByte = getProtocolSegmentIndex(
+            ProtocolSegmentsIndex::DATA_START
+        );
+        constexpr size_t nullTerminatorSize = 1;
+        const size_t dataSize = data.size() + nullTerminatorSize;
+
+        appendMultiByteField(buffer, dataStartByte, dataSize, data.data());
     }
 } // namespace smart_home::usp_protocol::version1

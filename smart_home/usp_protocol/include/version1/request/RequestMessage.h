@@ -30,6 +30,10 @@ namespace smart_home::usp_protocol::version1 {
         internal_SegmentsCount = 12
     };
 
+    constexpr size_t getRequestSegmentIndex(RequestSegmentsIndex index) {
+        return static_cast<size_t>(index);
+    }
+
     inline constexpr int REQUEST_CHUNKS_AMOUNT = static_cast<size_t>(
         RequestSegmentsIndex::internal_SegmentsCount
     );

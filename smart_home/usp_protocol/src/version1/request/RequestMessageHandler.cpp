@@ -9,18 +9,29 @@ namespace smart_home::usp_protocol::version1 {
     std::unique_ptr<RequestSerializationResult>
         RequestMessageHandler::serialize(RequestMessage* message)
     {
-        // TODO: Implement proper serialization logic
-        char resultBuffer[] = "Request Example";
-        RequestSerializationResult result {
-            true,
-            message,
-            std::vector(
-                resultBuffer,
-                resultBuffer + sizeof(resultBuffer) / sizeof(char)
-            )
-        };
+        std::vector<char> resultBuffer{};
+        constexpr size_t dataStartIndex = getRequestSegmentIndex(
+            RequestSegmentsIndex::DATA_START
+        );
+        constexpr size_t nullTerminatorSize = 1;
+        const size_t finalSize = dataStartIndex + message->data.size() + nullTerminatorSize;
+        resultBuffer.reserve(finalSize);
 
-        return std::make_unique<RequestSerializationResult>(result);
+        appendBasis(&resultBuffer, *message);
+        appendAction(&resultBuffer, message->action);
+        appendAuth(&resultBuffer, message->auth);
+        appendData(&resultBuffer, message->data);
+        appendGroup(&resultBuffer, message->actionGroup);
+        appendPacketIndex(&resultBuffer, message->packetIndex);
+        appendPacketsCount(&resultBuffer, message->packetsCount);
+        appendSize(&resultBuffer, static_cast<uint8_t>(message->data.size()));
+
+        return std::make_unique<RequestSerializationResult>(
+            RequestSerializationResult{
+                true,
+                message,
+                resultBuffer
+        });
     }
 
     std::unique_ptr<RequestDeserializationResult>
@@ -132,5 +143,97 @@ namespace smart_home::usp_protocol::version1 {
         } else {
             return const_cast<char*>(buffer + dataIndex);
         }
+    }
+
+    void RequestMessageHandler::appendAuth(
+        std::vector<char>* buffer,
+        const std::string& auth
+    ) const {
+        constexpr size_t authStartByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::AUTH_START
+        );
+        constexpr size_t authEndByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::AUTH_END
+        );
+        constexpr size_t bytesCount = authEndByte - authStartByte + 1;
+
+        appendMultiByteField(buffer, authStartByte, bytesCount, auth.data());
+    }
+
+    void RequestMessageHandler::appendGroup(
+        std::vector<char>* buffer,
+        const uint8_t group
+    ) const {
+        constexpr size_t groupByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::GROUP_BYTE
+        );
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(group);
+
+        appendMultiByteField(buffer, groupByte, 1, valueBytes.get());
+    }
+
+    void RequestMessageHandler::appendAction(
+        std::vector<char>* buffer,
+        const uint8_t action
+    ) const {
+        constexpr size_t actionByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::ACTION_BYTE
+        );
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(action);
+
+        appendMultiByteField(buffer, actionByte, 1, valueBytes.get());
+    }
+
+    void RequestMessageHandler::appendPacketIndex(
+        std::vector<char>* buffer,
+        const size_t packetIndex
+    ) const {
+        constexpr size_t packetIndexByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::PACKET_INDEX_BYTE
+        );
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<uint8_t>(packetIndex)
+        );
+
+        appendMultiByteField(buffer, packetIndexByte, 1, valueBytes.get());
+    }
+
+    void RequestMessageHandler::appendPacketsCount(
+        std::vector<char>* buffer,
+        const size_t packetsCount
+    ) const {
+        constexpr size_t packetsCountByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::PACKETS_COUNT_BYTE
+        );
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<uint8_t>(packetsCount)
+        );
+
+        appendMultiByteField(buffer, packetsCountByte, 1, valueBytes.get());
+    }
+
+    void RequestMessageHandler::appendSize(
+        std::vector<char>* buffer,
+        const uint8_t size
+    ) const {
+        constexpr size_t sizeByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::SIZE_BYTE
+        );
+        const std::unique_ptr<char[]> valueByte = utilities::BigEndianReader::uint8ToBytes(size);
+
+        appendMultiByteField(buffer, sizeByte, 1, valueByte.get());
+    }
+
+    void RequestMessageHandler::appendData(
+        std::vector<char>* buffer,
+        const std::string& data
+    ) const {
+        constexpr size_t dataStartByte = getRequestSegmentIndex(
+            RequestSegmentsIndex::DATA_START
+        );
+        constexpr size_t nullTerminatorSize = 1;
+        const size_t dataSize = data.size() + nullTerminatorSize;
+
+        appendMultiByteField(buffer, dataStartByte, dataSize, data.data());
     }
 } // namespace smart_home::usp_protocol::version1

@@ -8,18 +8,27 @@ namespace smart_home::usp_protocol::version1 {
     std::unique_ptr<ResponseSerializationResult>
         ResponseMessageHandler::serialize(ResponseMessage* message)
     {
-        // TODO: Implement proper serialization logic
-        char resultBuffer[] = "Response Example";
-        ResponseSerializationResult result {
-            true,
-            message,
-            std::vector(
-                resultBuffer,
-                resultBuffer + sizeof(resultBuffer) / sizeof(char)
-            )
-        };
+        std::vector<char> resultBuffer{};
+        constexpr size_t dataStartIndex = getResponseSegmentIndex(
+            ResponseSegmentsIndex::DATA_START
+        );
+        constexpr size_t nullTerminatorSize = 1;
+        const size_t finalSize = dataStartIndex + message->data.size() + nullTerminatorSize;
+        resultBuffer.reserve(finalSize);
 
-        return std::make_unique<ResponseSerializationResult>(result);
+        appendBasis(&resultBuffer, *message);
+        appendData(&resultBuffer, message->data);
+        appendStatus(&resultBuffer, message->status);
+        appendPacketsCount(&resultBuffer, message->packetsCount);
+        appendPacketIndex(&resultBuffer, message->packetIndex);
+        appendSize(&resultBuffer, message->data.size());
+
+        return std::make_unique<ResponseSerializationResult>(
+            ResponseSerializationResult{
+                true,
+                message,
+                resultBuffer
+        });
     }
 
     std::unique_ptr<ResponseDeserializationResult>
@@ -108,5 +117,74 @@ namespace smart_home::usp_protocol::version1 {
         } else {
             return const_cast<char*>(buffer + dataIndex);
         }
+    }
+
+    void ResponseMessageHandler::appendPacketIndex(
+        std::vector<char>* buffer,
+        const size_t packetIndex
+    ) const {
+        constexpr size_t packetIndexByte = getResponseSegmentIndex(
+            ResponseSegmentsIndex::PACKET_INDEX_BYTE
+        );
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<uint8_t>(packetIndex)
+        );
+
+        appendMultiByteField(buffer, packetIndexByte, 1, valueBytes.get());
+    }
+
+    void ResponseMessageHandler::appendPacketsCount(
+        std::vector<char>* buffer,
+        const size_t packetsCount
+    ) const {
+        constexpr size_t packetsCountByte = getResponseSegmentIndex(
+            ResponseSegmentsIndex::PACKETS_COUNT_BYTE
+        );
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<uint8_t>(packetsCount)
+        );
+
+        appendMultiByteField(buffer, packetsCountByte, 1, valueBytes.get());
+    }
+
+    void ResponseMessageHandler::appendStatus(
+        std::vector<char>* buffer,
+        const ResponseStatus& status
+    ) const {
+        constexpr size_t statusByte = getResponseSegmentIndex(
+            ResponseSegmentsIndex::PACKETS_COUNT_BYTE
+        );
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<uint8_t>(status)
+        );
+
+        appendMultiByteField(buffer, statusByte, 1, valueBytes.get());
+    }
+
+    void ResponseMessageHandler::appendSize(
+        std::vector<char>* buffer,
+        const size_t size
+    ) const {
+        constexpr size_t sizeByte = getResponseSegmentIndex(
+            ResponseSegmentsIndex::SIZE_BYTE
+        );
+        const std::unique_ptr<char[]> valueByte = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<uint8_t>(size)
+        );
+
+        appendMultiByteField(buffer, sizeByte, 1, valueByte.get());
+    }
+
+    void ResponseMessageHandler::appendData(
+        std::vector<char>* buffer,
+        const std::string& data
+    ) const {
+        constexpr size_t dataStartByte = getResponseSegmentIndex(
+            ResponseSegmentsIndex::DATA_START
+        );
+        constexpr size_t nullTerminatorSize = 1;
+        const size_t dataSize = data.size() + nullTerminatorSize;
+
+        appendMultiByteField(buffer, dataStartByte, dataSize, data.data());
     }
 } // namespace smart_home::usp_protocol::version1

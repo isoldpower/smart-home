@@ -5,8 +5,15 @@
 #include <arpa/inet.h>
 #include <smart_home/usp_protocol/include/version1/acknowledgement/AcknowledgementMessage.h>
 #include <smart_home/usp_protocol/include/version1/acknowledgement/AcknowledgementMessageHandler.h>
+#include <smart_home/usp_protocol/include/version1/protocol/ProtocolMessage.h>
+#include <smart_home/usp_protocol/include/version1/protocol/ProtocolMessageHandler.h>
+#include <smart_home/usp_protocol/include/version1/request/RequestMessage.h>
+#include <smart_home/usp_protocol/include/version1/request/RequestMessageHandler.h>
+#include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
+#include <smart_home/usp_protocol/include/version1/response/ResponseMessageHandler.h>
 #include <sys/socket.h>
 #include <unistd.h>
+
 #include <iostream>
 
 
@@ -35,28 +42,11 @@ namespace smart_home::playground::commands {
 
             const std::unique_ptr<sockaddr_in> serverAddress = openServerConnection(args);
             std::string messageData = "Vlad Lox TESTS-LUCK";
-            usp_protocol::version1::AcknowledgementMessage acknowledgeMessage{
-                usp_protocol::ProtocolVersion::VERSION_1,
-                322,
-                static_cast<uint64_t>(time(nullptr)),
-                12301,
-                usp_protocol::version1::AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
-                messageData.size(),
-                messageData
-            };
 
-            usp_protocol::version1::AcknowledgementMessageHandler handler;
-            const std::unique_ptr<
-                usp_protocol::version1::AcknowledgementSerializationResult
-            > packet = handler.serialize(&acknowledgeMessage);
-
-            if (packet->getIsSuccess()) {
-                std::string messageRaw{
-                    packet->getSerializationState()->begin(),
-                    packet->getSerializationState()->end()
-                };
-                sendRequest(clientSocket, *serverAddress, messageRaw);
-            }
+            sendAcknowledgementMessage(messageData, clientSocket, serverAddress.get());
+            sendProtocolMessage(messageData, clientSocket, serverAddress.get());
+            sendRequestMessage(messageData, clientSocket, serverAddress.get());
+            sendResponseMessage(messageData, clientSocket, serverAddress.get());
 
             return 0;
         } catch (const std::exception& e) {
@@ -66,6 +56,128 @@ namespace smart_home::playground::commands {
 
             std::cerr << e.what() << std::endl;
             return 1;
+        }
+    }
+
+    void UspClientRequestCommand::sendAcknowledgementMessage(
+        const std::string& message,
+        const int clientSocket,
+        const sockaddr_in* serverAddress
+    ) {
+        usp_protocol::version1::AcknowledgementMessage acknowledgeMessage{
+            usp_protocol::ProtocolVersion::VERSION_1,
+            322,
+            static_cast<uint64_t>(time(nullptr)),
+            12301,
+            usp_protocol::version1::AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
+            message.size(),
+            message
+        };
+
+        usp_protocol::version1::AcknowledgementMessageHandler handler;
+        const std::unique_ptr<
+            usp_protocol::version1::AcknowledgementSerializationResult
+        > packet = handler.serialize(&acknowledgeMessage);
+
+        if (packet->getIsSuccess()) {
+            std::string messageRaw{
+                packet->getSerializationState()->begin(),
+                packet->getSerializationState()->end()
+            };
+            sendRequest(clientSocket, *serverAddress, messageRaw);
+        }
+    }
+
+    void UspClientRequestCommand::sendProtocolMessage(
+        const std::string& message,
+        const int clientSocket,
+        const sockaddr_in* serverAddress
+    ) {
+        usp_protocol::version1::ProtocolMessage protocolMessage{
+            usp_protocol::ProtocolVersion::VERSION_1,
+            322,
+            static_cast<uint64_t>(time(nullptr)),
+            12301,
+            usp_protocol::version1::ProtocolAction::ACTION_HEARTBEAT,
+            message.size(),
+            message
+        };
+
+        usp_protocol::version1::ProtocolMessageHandler handler;
+        const std::unique_ptr<
+            usp_protocol::version1::ProtocolSerializationResult
+        > packet = handler.serialize(&protocolMessage);
+
+        if (packet->getIsSuccess()) {
+            std::string messageRaw{
+                packet->getSerializationState()->begin(),
+                packet->getSerializationState()->end()
+            };
+            sendRequest(clientSocket, *serverAddress, messageRaw);
+        }
+    }
+
+    void UspClientRequestCommand::sendRequestMessage(
+        const std::string& message,
+        const int clientSocket,
+        const sockaddr_in* serverAddress
+    ) {
+        usp_protocol::version1::RequestMessage requestMessage{
+            usp_protocol::ProtocolVersion::VERSION_1,
+            322,
+            static_cast<uint64_t>(time(nullptr)),
+            12301,
+            1,
+            0,
+            "",
+            0x01,
+            0x01,
+            message.size(),
+            message
+        };
+
+        usp_protocol::version1::RequestMessageHandler handler;
+        const std::unique_ptr<
+            usp_protocol::version1::RequestSerializationResult
+        > packet = handler.serialize(&requestMessage);
+
+        if (packet->getIsSuccess()) {
+            std::string messageRaw{
+                packet->getSerializationState()->begin(),
+                packet->getSerializationState()->end()
+            };
+            sendRequest(clientSocket, *serverAddress, messageRaw);
+        }
+    }
+
+    void UspClientRequestCommand::sendResponseMessage(
+        const std::string& message,
+        const int clientSocket,
+        const sockaddr_in* serverAddress
+    ) {
+        usp_protocol::version1::ResponseMessage responseMessage{
+            usp_protocol::ProtocolVersion::VERSION_1,
+            322,
+            static_cast<uint64_t>(time(nullptr)),
+            12301,
+            1,
+            0,
+            usp_protocol::version1::ResponseStatus::STATUS_OK,
+            message.size(),
+            message
+        };
+
+        usp_protocol::version1::ResponseMessageHandler handler;
+        const std::unique_ptr<
+            usp_protocol::version1::ResponseSerializationResult
+        > packet = handler.serialize(&responseMessage);
+
+        if (packet->getIsSuccess()) {
+            std::string messageRaw{
+                packet->getSerializationState()->begin(),
+                packet->getSerializationState()->end()
+            };
+            sendRequest(clientSocket, *serverAddress, messageRaw);
         }
     }
 

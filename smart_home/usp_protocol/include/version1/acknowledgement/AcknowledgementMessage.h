@@ -25,7 +25,7 @@ namespace smart_home::usp_protocol::version1 {
         internal_SegmentsCount = 8,
     };
 
-    inline size_t getAcknowledgementSegmentIndex(AcknowledgementSegmentsIndex index) {
+    constexpr size_t getAcknowledgementSegmentIndex(AcknowledgementSegmentsIndex index) {
         return static_cast<size_t>(index);
     }
 

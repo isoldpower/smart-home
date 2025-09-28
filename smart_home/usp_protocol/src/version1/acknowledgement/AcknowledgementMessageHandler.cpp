@@ -10,7 +10,7 @@ namespace smart_home::usp_protocol::version1 {
         AcknowledgementMessageHandler::serialize(AcknowledgementMessage* message)
     {
         std::vector<char> resultBuffer{};
-        const size_t dataStartIndex = getAcknowledgementSegmentIndex(
+        constexpr size_t dataStartIndex = getAcknowledgementSegmentIndex(
             AcknowledgementSegmentsIndex::DATA_START
         );
         constexpr size_t nullTerminatorSize = 1;
@@ -105,89 +105,41 @@ namespace smart_home::usp_protocol::version1 {
         }
     }
 
-    void AcknowledgementMessageHandler::appendBasis(
-        std::vector<char>* buffer,
-        const CommonMessageData& data
-    ) const {
-        size_t basisSize = 0;
-        const auto serializedBasis = basisHandler->serializeCommonData(
-            data,
-            basisSize
-        );
-
-        if (buffer->capacity() <= basisSize) {
-            throw std::out_of_range("Buffer too small to append basis data");
-        } else if (buffer->size() <= basisSize) {
-            buffer->resize(basisSize);
-        }
-
-        std::copy_n(
-            serializedBasis.get(),
-            basisSize,
-            buffer->begin()
-        );
-    }
-
     void AcknowledgementMessageHandler::appendStatus(
         std::vector<char>* buffer,
         const AcknowledgementStatus& status
     ) const {
-        const size_t statusByte = getAcknowledgementSegmentIndex(
+        constexpr size_t statusByte = getAcknowledgementSegmentIndex(
             AcknowledgementSegmentsIndex::STATUS_BYTE
         );
-
-        if (buffer->capacity() <= statusByte) {
-            throw std::out_of_range("Buffer too small to append status");
-        } else if (buffer->size() <= statusByte) {
-            buffer->resize(statusByte + 1);
-        }
-
-        const auto primitiveValue = static_cast<uint8_t>(status);
-        (*buffer)[statusByte] = utilities::BigEndianReader::uint8ToBytes(primitiveValue)[0];
+        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
+            static_cast<uint8_t>(status)
+        );
+        appendMultiByteField(buffer, statusByte, 1, valueBytes.get());
     }
 
     void AcknowledgementMessageHandler::appendSize(
         std::vector<char>* buffer,
-        uint8_t size
+        const uint8_t size
     ) const {
-        const size_t sizeByte = getAcknowledgementSegmentIndex(
+        constexpr size_t sizeByte = getAcknowledgementSegmentIndex(
             AcknowledgementSegmentsIndex::SIZE_BYTE
         );
-
-        if (buffer->capacity() <= sizeByte) {
-            throw std::out_of_range("Buffer too small to append size");
-        } else if (buffer->size() <= sizeByte) {
-            buffer->resize(sizeByte + 1);
-        }
-
-        (*buffer)[sizeByte] = utilities::BigEndianReader::uint8ToBytes(size)[0];
+        const std::unique_ptr<char[]> valueByte = utilities::BigEndianReader::uint8ToBytes(size);
+        appendMultiByteField(buffer, sizeByte, 1, valueByte.get());
     }
 
     void AcknowledgementMessageHandler::appendData(
         std::vector<char>* buffer,
         const std::string& data
     ) const {
-        const size_t dataStartByte = getAcknowledgementSegmentIndex(
+        constexpr size_t dataStartByte = getAcknowledgementSegmentIndex(
             AcknowledgementSegmentsIndex::DATA_START
         );
         constexpr size_t nullTerminatorSize = 1;
-        const size_t requiredSize = dataStartByte + data.size() + nullTerminatorSize;
+        const size_t dataSize = data.size() + nullTerminatorSize;
 
-        if (buffer->capacity() < requiredSize) {
-            throw std::out_of_range("Buffer too small to append data. Expected size: "
-                + std::to_string(requiredSize)
-                + ", capacity: "
-                + std::to_string(buffer->capacity())
-            );
-        } else if (buffer->size() < requiredSize) {
-            buffer->resize(requiredSize);
-        }
-
-        std::copy_n(
-            data.data(),
-            data.size(),
-            buffer->begin() + static_cast<long>(dataStartByte)
-        );
+        appendMultiByteField(buffer, dataStartByte, dataSize, data.data());
     }
 
 } // namespace smart_home::usp_protocol::version1

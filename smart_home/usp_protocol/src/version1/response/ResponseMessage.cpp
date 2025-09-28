@@ -27,7 +27,7 @@ namespace smart_home::usp_protocol::version1 {
         : model::Message(
             protocolVersion,
             sessionId,
-            MessageType::MESSAGE_REQUEST,
+            MessageType::MESSAGE_RESPONSE,
             timestamp,
             requestId
         )

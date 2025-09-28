@@ -26,6 +26,10 @@ namespace smart_home::usp_protocol::version1 {
         uint8_t determineAction(const char* buffer, size_t length) const;
         size_t determineSize(const char* buffer, size_t length) const;
         char* parseDataPointer(const char* buffer, size_t length) const;
+
+        void appendAction(std::vector<char>* buffer, ProtocolAction action) const;
+        void appendSize(std::vector<char>* buffer, uint8_t size) const;
+        void appendData(std::vector<char>* buffer, const std::string& data) const;
     public:
         std::unique_ptr<ProtocolSerializationResult>
             serialize(ProtocolMessage*) override;
