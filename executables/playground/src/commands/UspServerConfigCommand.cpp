@@ -1,12 +1,13 @@
 #include "../../include/commands/UspServerConfigCommand.h"
 
-#include <smart_home/usp_server/include/UspServer.h>
+#include <smart_home/daemon/include/Daemon.h>
+#include <smart_home/daemon/include/DaemonRunner.h>
+#include <smart_home/daemon/include/SignalDaemon.h>
 #include <smart_home/usp_server/include/UspServerRequest.h>
 #include <smart_home/usp_server/include/UspServerResponse.h>
-#include <smart_home/daemon/include/Daemon.h>
-#include <smart_home/daemon/include/SignalDaemon.h>
+#include <smart_home/usp_server/include/UspSyncServer.h>
 #include <smart_home/utilities/include/TypesHelper.h>
-
+#include <smart_home/utilities/include/exceptions/ExceptionsLoggerShell.h>
 #include <iostream>
 
 
@@ -20,7 +21,7 @@ namespace smart_home::playground::commands {
     }
 
     int UspServerConfigCommand::execute(int argc, char* argv[]) {
-        usp_server::UspServer uspServer({
+        usp_server::UspSyncServer uspServer({
             "localhost",
             12345
         });
@@ -28,11 +29,15 @@ namespace smart_home::playground::commands {
         // uspServer.addMiddleware(std::make_shared<usp_protocol::middlewares::LoggingMiddleware>());
 
         daemon::DaemonProcess* daemon = new daemon::SignalDaemon();
-        daemon->bootstrap();
-        uspServer.startServer(utilities::methodToFunction(
-            &daemon::DaemonProcess::getIsActive,
-            daemon
-        ));
+        daemon::DaemonRunner runner(daemon);
+        DaemonExceptionsLoggerShell loggerMiddleware({}, "USP Server Daemon Procedure");
+        runner.addWrapper(&loggerMiddleware);
+
+        uspServer.startServer();
+        runner.cycleProcedure([&uspServer]() {
+            uspServer.receiveMessage();
+        });
+        uspServer.closeServer();
 
         return 0;
     }

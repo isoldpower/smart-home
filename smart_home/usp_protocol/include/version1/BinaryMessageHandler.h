@@ -1,9 +1,12 @@
 #pragma once
 
+#include <iostream>
 #include <vector>
 
-#include "../model/ProtocolMessageHandler.h"
 #include "./MessageBasisHandler.h"
+#include "../ExecutionCodes.h"
+#include "../exceptions/ProtocolAllocationException.h"
+#include "../model/ProtocolMessageHandler.h"
 
 
 namespace smart_home::usp_protocol::version1 {
@@ -14,18 +17,38 @@ namespace smart_home::usp_protocol::version1 {
     protected:
         MessageBasisHandler* basisHandler;
 
+        void validateBufferAllocations(
+            std::vector<char>* buffer,
+            const size_t requiredSize
+        ) const {
+            if (buffer->capacity() < requiredSize) {
+                const std::string warningMessage = "Buffer is too small to append passed data,"
+                                                   " extra reallocation(s) required. Expected size: "
+                    + std::to_string(requiredSize)
+                    + ", capacity: "
+                    + std::to_string(buffer->capacity());
+                const auto exception = exceptions::ProtocolAllocationException(
+                    exceptions::ExceptionLevel::WARNING,
+                    castedExecutionCode(ExecutionCodes::INEFFICIENT_MEMORY_ALLOCATION),
+                    warningMessage.c_str()
+                );
+
+                std::cout << exception.what() << std::endl;
+                buffer->reserve(requiredSize);
+            }
+
+            if (buffer->size() <= requiredSize) {
+                buffer->resize(requiredSize);
+            }
+        }
+
         void appendBasis(std::vector<char>* buffer, const CommonMessageData& data) const {
             size_t basisSize = 0;
             const auto serializedBasis = basisHandler->serializeCommonData(
                 data,
                 basisSize
             );
-
-            if (buffer->capacity() <= basisSize) {
-                throw std::out_of_range("Buffer too small to append basis data");
-            } else if (buffer->size() <= basisSize) {
-                buffer->resize(basisSize);
-            }
+            validateBufferAllocations(buffer, basisSize);
 
             std::copy_n(
                 serializedBasis.get(),
@@ -41,16 +64,7 @@ namespace smart_home::usp_protocol::version1 {
             const char* data
         ) const {
             const size_t requiredSize = startIndex + byteCount;
-
-            if (buffer->capacity() < requiredSize) {
-                throw std::out_of_range("Buffer too small to append data. Expected size: "
-                    + std::to_string(requiredSize)
-                    + ", capacity: "
-                    + std::to_string(buffer->capacity())
-                );
-            } else if (buffer->size() < requiredSize) {
-                buffer->resize(requiredSize);
-            }
+            validateBufferAllocations(buffer, requiredSize);
 
             std::copy_n(
                 data,

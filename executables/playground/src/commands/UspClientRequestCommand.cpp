@@ -2,7 +2,6 @@
 
 #include "../../include/commands/UspClientRequestCommand.h"
 
-#include <arpa/inet.h>
 #include <smart_home/usp_protocol/include/version1/acknowledgement/AcknowledgementMessage.h>
 #include <smart_home/usp_protocol/include/version1/acknowledgement/AcknowledgementMessageHandler.h>
 #include <smart_home/usp_protocol/include/version1/protocol/ProtocolMessage.h>
@@ -11,9 +10,9 @@
 #include <smart_home/usp_protocol/include/version1/request/RequestMessageHandler.h>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessageHandler.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <unistd.h>
-
 #include <iostream>
 
 
@@ -73,7 +72,6 @@ namespace smart_home::playground::commands {
             message.size(),
             message
         };
-
         usp_protocol::version1::AcknowledgementMessageHandler handler;
         const std::unique_ptr<
             usp_protocol::version1::AcknowledgementSerializationResult

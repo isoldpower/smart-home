@@ -12,7 +12,11 @@ add_library(usp_protocol STATIC
         src/version1/protocol/ProtocolMessageHandler.cpp
         src/version1/MessageBasisHandler.cpp
         src/version1/ProtocolVersion1.cpp
-        src/version1/BinaryMessageHandler.cpp)
+        src/version1/BinaryMessageHandler.cpp
+        src/exceptions/ProtocolAllocationException.cpp
+        src/exceptions/ProtocolPacketException.cpp
+        src/exceptions/ProtocolSerializationException.cpp
+        src/exceptions/ProtocolStructuralException.cpp)
 
 if (BUILD_TESTING)
     add_executable(usp_protocol_tests tests/main.cpp)

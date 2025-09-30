@@ -1,5 +1,6 @@
 add_library(daemon STATIC
-        src/SignalDaemon.cpp)
+        src/SignalDaemon.cpp
+        src/DaemonRunner.cpp)
 
 if (BUILD_TESTING)
     add_executable(daemon_tests tests/main.cpp)

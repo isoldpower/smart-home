@@ -1,7 +1,10 @@
 #include "../../../include/version1/request/RequestMessageHandler.h"
 
-#include <iostream>
 #include <smart_home/utilities/include/BinaryReader.h>
+#include <iostream>
+
+#include "../../../include/exceptions/ProtocolStructuralException.h"
+#include "../../../include/exceptions/ProtocolSerializationException.h"
 
 
 namespace smart_home::usp_protocol::version1 {
@@ -71,12 +74,19 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto authEndIndex = static_cast<size_t>(RequestSegmentsIndex::AUTH_END);
 
         if (length <= authEndIndex) {
-            throw std::out_of_range("Buffer too small to determine auth");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Auth segment value."
+            );
         } else if constexpr (authEndIndex - authStartIndex + 1 != sizeof(uint32_t)) {
-            throw std::out_of_range("Auth segment size mismatch");
+            throw exceptions::ProtocolSerializationException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::WRONG_VERSION_STRUCTURE),
+                "Auth size mismatch between passed type size and space available in the protocol message structure."
+            );
         } else {
             return { &buffer[authStartIndex], sizeof(uint32_t) };
-            // return utilities::BigEndianReader::bytesToUint32(&buffer[authStartIndex]);
         }
     }
 
@@ -84,7 +94,11 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto groupIndex = static_cast<size_t>(RequestSegmentsIndex::GROUP_BYTE);
 
         if (length <= groupIndex) {
-            throw std::out_of_range("Buffer too small to determine group");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Group segment value."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[groupIndex]);
         }
@@ -94,7 +108,11 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto actionIndex = static_cast<size_t>(RequestSegmentsIndex::ACTION_BYTE);
 
         if (length <= actionIndex) {
-            throw std::out_of_range("Buffer too small to determine action");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Action segment value."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[actionIndex]);
         }
@@ -106,7 +124,11 @@ namespace smart_home::usp_protocol::version1 {
         );
 
         if (length <= packetsCountIndex) {
-            throw std::out_of_range("Buffer too small to determine packets count");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Packets Count segment value."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[packetsCountIndex]);
         }
@@ -118,7 +140,11 @@ namespace smart_home::usp_protocol::version1 {
         );
 
         if (length <= packetIndexIndex) {
-            throw std::out_of_range("Buffer too small to determine packet index");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Packet Index segment value."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[packetIndexIndex]);
         }
@@ -129,7 +155,11 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto sizeIndex = static_cast<size_t>(RequestSegmentsIndex::SIZE_BYTE);
 
         if (length <= sizeIndex) {
-            throw std::out_of_range("Buffer too small to determine size");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Size segment value."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[sizeIndex]);
         }
@@ -139,7 +169,11 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto dataIndex = static_cast<size_t>(RequestSegmentsIndex::DATA_START);
 
         if (length <= dataIndex) {
-            throw std::out_of_range("Buffer too small to determine data pointer");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Data segment value."
+            );
         } else {
             return const_cast<char*>(buffer + dataIndex);
         }

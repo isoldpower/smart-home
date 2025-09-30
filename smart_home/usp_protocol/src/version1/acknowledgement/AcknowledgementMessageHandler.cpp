@@ -3,6 +3,8 @@
 #include <smart_home/utilities/include/BinaryReader.h>
 #include <iostream>
 
+#include "../../../include/exceptions/ProtocolPacketException.h"
+
 
 namespace smart_home::usp_protocol::version1 {
 
@@ -69,7 +71,11 @@ namespace smart_home::usp_protocol::version1 {
         );
 
         if (length <= statusIndex) {
-            throw std::out_of_range("Buffer too small to determine status");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine ACK status."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[statusIndex]);
         }
@@ -84,7 +90,11 @@ namespace smart_home::usp_protocol::version1 {
         );
 
         if (length <= sizeIndex) {
-            throw std::out_of_range("Buffer too small to determine size");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Data Size."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[sizeIndex]);
         }
@@ -99,7 +109,11 @@ namespace smart_home::usp_protocol::version1 {
         );
 
         if (length <= dataIndex) {
-            throw std::out_of_range("Buffer too small to parse data pointer");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is too small to determine Data pointer."
+            );
         } else {
             return const_cast<char*>(buffer + dataIndex);
         }

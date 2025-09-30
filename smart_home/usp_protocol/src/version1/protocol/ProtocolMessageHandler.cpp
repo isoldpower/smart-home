@@ -2,6 +2,9 @@
 
 #include <smart_home/utilities/include/BinaryReader.h>
 
+#include "../../../include/ExecutionCodes.h"
+#include "../../../include/exceptions/ProtocolPacketException.h"
+
 
 namespace smart_home::usp_protocol::version1 {
 
@@ -63,7 +66,11 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto actionIndex = static_cast<size_t>(ProtocolSegmentsIndex::ACTION_BYTE);
 
         if (length <= actionIndex) {
-            throw std::out_of_range("Buffer too small to determine action");
+            throw exceptions::ProtocolPacketException(
+                exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer is too small to determine action"
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[actionIndex]);
         }
@@ -73,7 +80,11 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto sizeIndex = static_cast<size_t>(ProtocolSegmentsIndex::SIZE_BYTE);
 
         if (length <= sizeIndex) {
-            throw std::out_of_range("Buffer too small to determine size");
+            throw exceptions::ProtocolPacketException(
+                exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer is too small to determine size"
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint8(&buffer[sizeIndex]);
         }
@@ -83,7 +94,11 @@ namespace smart_home::usp_protocol::version1 {
         constexpr auto dataIndex = static_cast<size_t>(ProtocolSegmentsIndex::DATA_START);
 
         if (length <= dataIndex) {
-            throw std::out_of_range("Buffer too small to determine data pointer");
+            throw exceptions::ProtocolPacketException(
+                exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer is too small to determine data pointer"
+            );
         } else {
             return const_cast<char*>(buffer + dataIndex);
         }

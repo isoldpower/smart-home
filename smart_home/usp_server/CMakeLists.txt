@@ -1,9 +1,10 @@
 add_library(usp_server STATIC
-        src/UspServer.cpp
         src/UspServerConfig.cpp
         src/UspServerRequest.cpp
         src/UspServerResponse.cpp
-        src/packets/SequencedPacketPoller.cpp)
+        src/UspSyncServer.cpp
+        src/packets/SequencedPacketPoller.cpp
+        src/model/UspServer.cpp)
 
 if (BUILD_TESTING)
     add_executable(usp_server_tests tests/main.cpp)

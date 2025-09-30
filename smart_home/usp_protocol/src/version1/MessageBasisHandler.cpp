@@ -1,21 +1,28 @@
 #include "../../include/version1/MessageBasisHandler.h"
 
+#include <smart_home/utilities/include/exceptions/LevelException.h>
+#include <smart_home/utilities/include/BinaryReader.h>
 #include <iostream>
 #include <ostream>
 #include <string>
 
-#include "./BinaryReader.h"
+#include "../../include/ExecutionCodes.h"
+#include "../../include/exceptions/ProtocolPacketException.h"
+#include "../../include/exceptions/ProtocolStructuralException.h"
 
-// TODO: Replace all exit() states with exceptions including detailed messages and error codes.
-// TODO: Add levels of exceptions (critical, warning, info). Critical should stop processing, others should log and continue.
+
 namespace smart_home::usp_protocol::version1 {
 
     CommonMessageData MessageBasisHandler::parseCommonData(
         const char* buffer,
-        size_t length
+        const size_t length
     ) const {
         if (length < MessageSettings::MIN_PACKET_SIZE) {
-            throw std::runtime_error("Buffer length is less than minimum packet size.");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is less than minimum packet size."
+            );
         }
 
         return CommonMessageData{
@@ -52,19 +59,33 @@ namespace smart_home::usp_protocol::version1 {
         const size_t typeByteIndex = getCommonMessageIndex(CommonMessageIndexes::TYPE_BYTE);
 
         if (length < typeByteIndex + 1) {
-            throw std::runtime_error("Buffer length is less than expected for type byte.");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_DATA_ERROR),
+                "Buffer length is less than expected for Type byte."
+            );
         } else {
             uint8_t typeValue = utilities::BigEndianReader::bytesToUint8(&buffer[typeByteIndex]);
             return static_cast<MessageType>(typeValue);
         }
     }
 
-    uint16_t MessageBasisHandler::determineSessionId(const char* buffer, size_t _) const {
+    uint16_t MessageBasisHandler::determineSessionId(const char* buffer, size_t length) const {
         const size_t startByte = getCommonMessageIndex(CommonMessageIndexes::SESSION_ID_START);
         const size_t endByte = getCommonMessageIndex(CommonMessageIndexes::SESSION_ID_END);
 
         if (endByte - startByte + 1 != sizeof(uint16_t)) {
-            throw std::runtime_error("Session ID size mismatch.");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_DATA_ERROR),
+                "Session ID bytes chunk size mismatch."
+            );
+        } else if (length <= endByte) {
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is less than expected for Session ID byte."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint16(&buffer[startByte]);
         }
@@ -75,7 +96,17 @@ namespace smart_home::usp_protocol::version1 {
         const size_t endByte = getCommonMessageIndex(CommonMessageIndexes::REQUEST_ID_END);
 
         if (endByte - startByte + 1 != sizeof(uint16_t)) {
-            throw std::runtime_error("Request ID size mismatch.");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_DATA_ERROR),
+                "Request ID bytes chunk size mismatch."
+            );
+        } else if (length <= endByte) {
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is less than expected for Request ID byte."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint16(&buffer[startByte]);
         }
@@ -86,7 +117,17 @@ namespace smart_home::usp_protocol::version1 {
         const size_t endByte = getCommonMessageIndex(CommonMessageIndexes::TIMESTAMP_END);
 
         if (endByte - startByte + 1 != sizeof(uint64_t)) {
-            throw std::runtime_error("Timestamp size mismatch.");
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Timestamp bytes chunk size mismatch."
+            );
+        } else if (length <= endByte) {
+            throw exceptions::ProtocolPacketException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                "Buffer length is less than expected for Session ID byte."
+            );
         } else {
             return utilities::BigEndianReader::bytesToUint64(&buffer[startByte]);
         }
@@ -97,7 +138,11 @@ namespace smart_home::usp_protocol::version1 {
         const size_t endByte = getCommonMessageIndex(CommonMessageIndexes::SESSION_ID_END);
 
         if (endByte - startByte + 1 != sizeof(uint16_t)) {
-            throw std::runtime_error("Session ID size mismatch.");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::WRONG_VERSION_STRUCTURE),
+                "Session ID size mismatch between passed type size and space available in the protocol message structure."
+            );
         } else {
             const std::unique_ptr<char[]> sessionSerialized =
                 utilities::BigEndianReader::uint16ToBytes(sessionId);
@@ -115,7 +160,11 @@ namespace smart_home::usp_protocol::version1 {
         const size_t endByte = getCommonMessageIndex(CommonMessageIndexes::REQUEST_ID_END);
 
         if (endByte - startByte + 1 != sizeof(uint16_t)) {
-            throw std::runtime_error("Request ID size mismatch.");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::WRONG_VERSION_STRUCTURE),
+                "Request ID size mismatch between passed type size and space available in the protocol message structure."
+            );
         } else {
             const std::unique_ptr<char[]> requestSerialized =
                 utilities::BigEndianReader::uint16ToBytes(requestId);
@@ -133,7 +182,11 @@ namespace smart_home::usp_protocol::version1 {
         const size_t endByte = getCommonMessageIndex(CommonMessageIndexes::TIMESTAMP_END);
 
         if (endByte - startByte + 1 != sizeof(uint64_t)) {
-            throw std::runtime_error("Timestamp size mismatch.");
+            throw exceptions::ProtocolStructuralException(
+                utilities::exceptions::ExceptionLevel::ERROR,
+                castedExecutionCode(ExecutionCodes::WRONG_VERSION_STRUCTURE),
+                "Timestamp size mismatch between passed type size and space available in the protocol message structure."
+            );
         } else {
             const std::unique_ptr<char[]> timestampSerialized =
                 utilities::BigEndianReader::uint64ToBytes(timestamp);

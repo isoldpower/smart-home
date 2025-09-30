@@ -27,7 +27,7 @@ namespace smart_home::usp_protocol::version1 {
         internal_SegmentsCount = 10
     };
 
-    constexpr size_t getResponseSegmentIndex(ResponseSegmentsIndex index) {
+    consteval size_t getResponseSegmentIndex(ResponseSegmentsIndex index) {
         return static_cast<size_t>(index);
     }
 

@@ -1,6 +1,8 @@
 #include "../include/MessageUnion.h"
 
+#include <smart_home/usp_protocol/include/exceptions/ProtocolPacketException.h>
 #include <iostream>
+
 
 namespace smart_home::usp_protocol {
 
@@ -68,7 +70,11 @@ namespace smart_home::usp_protocol {
                 break;
             }
             default: {
-                throw std::invalid_argument("Unsupported message type");
+                throw exceptions::ProtocolPacketException(
+                    exceptions::ExceptionLevel::ERROR,
+                    castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_UNKNOWN_TYPE),
+                    "Unknown message type received"
+                );
             }
         }
     }
