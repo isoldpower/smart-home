@@ -16,7 +16,7 @@ namespace smart_home::usp_server {
         delete requestPacketPoller;
     }
 
-    void UspServer::addMiddleware(const std::any& middleware) {
+    void UspServer::addMiddleware(const std::any&) {
         std::cerr << "USP Middlewares are not implemented yet." << std::endl;
     }
 

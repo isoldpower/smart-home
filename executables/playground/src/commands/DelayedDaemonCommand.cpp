@@ -21,7 +21,7 @@ namespace smart_home::playground::commands {
         }
     }
 
-    int DelayedDaemonCommand::execute(int argc, char* argv[]) {
+    int DelayedDaemonCommand::execute(int, char*[]) {
         DaemonProcess* daemon = new DelayedSignalDaemon();
         daemon->bootstrap();
         while (daemon->getIsActive()) {

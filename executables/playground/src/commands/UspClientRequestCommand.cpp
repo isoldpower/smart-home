@@ -1,5 +1,3 @@
-#pragma once
-
 #include "../../include/commands/UspClientRequestCommand.h"
 
 #include <smart_home/usp_protocol/include/version1/acknowledgement/AcknowledgementMessage.h>

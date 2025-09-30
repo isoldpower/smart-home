@@ -67,11 +67,13 @@ namespace smart_home::utilities {
             }
 
             auto bytes = std::make_unique<char[]>(length);
+            auto temporary = static_cast<uint64_t>(value);
+
             for (size_t i = 0; i < length; ++i) {
                 // Store bytes in big-endian order. We extract the least significant byte first
                 // and place it at the end of the array, moving backwards.
-                bytes[length - 1 - i] = static_cast<char>(value & 0xFF);
-                value >>= 8;
+                bytes[length - 1 - i] = static_cast<char>(temporary & 0xFF);
+                temporary >>= 8;
             }
 
             return bytes;

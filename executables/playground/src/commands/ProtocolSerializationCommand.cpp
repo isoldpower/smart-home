@@ -15,7 +15,7 @@
 namespace smart_home::playground::commands {
     using namespace usp_protocol;
 
-    int ProtocolSerializationCommand::execute(int argc, char* argv[]) {
+    int ProtocolSerializationCommand::execute(int, char*[]) {
         ProtocolVersion protocolVersion = ProtocolVersion::VERSION_1;
         std::string sessionId = "sessionId";
         uint64_t timestamp = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

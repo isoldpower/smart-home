@@ -97,6 +97,7 @@ namespace smart_home::web_server {
         if (socketDescriptor < 0) {
             std::cerr << "Failed to create socket." << std::endl;
             exitWithCode(NetServerExitCodes::EXT_ERR_SOCKET_CREATION);
+            return -1;
         } else {
             return socketDescriptor;
         }
