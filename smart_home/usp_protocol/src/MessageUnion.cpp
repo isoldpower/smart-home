@@ -39,7 +39,7 @@ namespace smart_home::usp_protocol {
                 >(referencePointer)->getDeserializationState();
                 constructedSuccessfully = std::get<
                     std::unique_ptr<version1::ResponseDeserializationResult>
-                >(referencePointer)->getDeserializationState();
+                >(referencePointer)->isSuccess();
 
                 break;
             }

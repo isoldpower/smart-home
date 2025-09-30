@@ -9,6 +9,8 @@ namespace smart_home::usp_protocol::exceptions {
     class ProtocolPacketException
         : public CompleteException
     {
+    private:
+        std::string rawMessage;
     public:
         explicit ProtocolPacketException(
             ExceptionLevel level,

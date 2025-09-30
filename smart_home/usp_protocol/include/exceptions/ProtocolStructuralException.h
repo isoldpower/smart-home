@@ -1,6 +1,7 @@
 #pragma once
 
 #include <smart_home/utilities/include/exceptions/CompleteException.h>
+#include <string>
 
 
 namespace smart_home::usp_protocol::exceptions {
@@ -9,6 +10,8 @@ namespace smart_home::usp_protocol::exceptions {
     class ProtocolStructuralException
         : public CompleteException
     {
+    private:
+        std::string messageRaw;
     public:
         explicit ProtocolStructuralException(
             ExceptionLevel level,

@@ -17,13 +17,11 @@ namespace smart_home::utilities::exceptions {
         const std::string messagePrefix = "[" + levelVerbose + " #" + std::to_string(errorCode) + "]";
         const std::string finalMessage = messagePrefix + " " + message;
 
-        const auto newString = new char[finalMessage.size() + 1];
-        strcpy(newString, finalMessage.c_str());
-        this->message = newString;
+        this->messageRaw = finalMessage;
     }
 
     const char* CompleteException::what() const noexcept {
-        return message;
+        return messageRaw.c_str();
     }
 
 } // namespace smart_home::utilities::exceptions

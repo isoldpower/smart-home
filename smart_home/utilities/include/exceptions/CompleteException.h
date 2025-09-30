@@ -10,6 +10,8 @@ namespace smart_home::utilities::exceptions {
         : public CodeException
         , public LevelException
     {
+    private:
+        std::string messageRaw;
     protected:
         const char* message;
     public:

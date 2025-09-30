@@ -175,7 +175,7 @@ namespace smart_home::usp_protocol::version1 {
         const ResponseStatus& status
     ) const {
         constexpr size_t statusByte = getResponseSegmentIndex(
-            ResponseSegmentsIndex::PACKETS_COUNT_BYTE
+            ResponseSegmentsIndex::STATUS_BYTE
         );
         const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
             static_cast<uint8_t>(status)
