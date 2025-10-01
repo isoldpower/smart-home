@@ -20,6 +20,8 @@ namespace smart_home::daemon {
                 }
             }
         }
+
+        underlyingProcess->waitForShutdown();
     }
 
     void DaemonRunner::addWrapper(ProcedureWrapper* wrapper) {
