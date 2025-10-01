@@ -4,6 +4,7 @@
 #include "../include/version1/ProtocolVersion1.h"
 
 #include <iostream>
+#include <array>
 
 
 namespace smart_home::usp_protocol {
@@ -18,17 +19,24 @@ namespace smart_home::usp_protocol {
             return nullptr;
         }
 
+        std::unique_ptr<model::ProtocolBasisHandler> relatedVersion = nullptr;
         std::array<model::ProtocolVersion<char>*, 1> versions = {
             new version1::ProtocolVersion1{},
         };
+
         for (const auto& version : versions) {
             if (version->isMessageOfThisVersion(buffer)) {
-                return version->buildRelatedHandler();
+                relatedVersion = version->buildRelatedHandler();
             }
+            delete version;
         }
 
-        std::cerr << "Unable to resolve protocol version of passed buffer:" << std::endl
-                  << '\t' << buffer << std::endl;
-        return nullptr;
+        if (relatedVersion == nullptr) {
+            std::cerr << "Unable to resolve protocol version of passed buffer:" << std::endl
+                      << '\t' << buffer << std::endl;
+            return nullptr;
+        } else {
+            return relatedVersion;
+        }
     }
 } // namespace smart_home::usp_protocol

@@ -3,6 +3,7 @@
 #include <smart_home/usp_protocol/include/version1/request/RequestMessage.h>
 #include <smart_home/web_server/include/NetServer.h>
 #include <any>
+#include <functional>
 
 #include "../UspServerConfig.h"
 #include "../UspServerRequest.h"
@@ -10,6 +11,7 @@
 
 
 namespace smart_home::usp_server {
+
     using namespace smart_home::usp_protocol;
 
     using HandlerFunction = std::function<void(

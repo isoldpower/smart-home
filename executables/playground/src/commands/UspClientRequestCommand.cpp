@@ -12,6 +12,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <iostream>
+#include <cstring>
 
 
 namespace smart_home::playground::commands {
@@ -38,7 +39,7 @@ namespace smart_home::playground::commands {
             clientSocket = createSocket();
 
             const std::unique_ptr<sockaddr_in> serverAddress = openServerConnection(args);
-            std::string messageData = "Vlad Lox TESTS-LUCK";
+            const std::string messageData = "Vlad Lox TESTS-LUCK";
 
             sendAcknowledgementMessage(messageData, clientSocket, serverAddress.get());
             sendProtocolMessage(messageData, clientSocket, serverAddress.get());
@@ -118,6 +119,9 @@ namespace smart_home::playground::commands {
         const int clientSocket,
         const sockaddr_in* serverAddress
     ) {
+        std::string authEmpty;
+        authEmpty.assign('A', 4);
+
         usp_protocol::version1::RequestMessage requestMessage{
             usp_protocol::ProtocolVersion::VERSION_1,
             322,
@@ -125,7 +129,7 @@ namespace smart_home::playground::commands {
             12301,
             1,
             0,
-            "",
+            authEmpty,
             0x01,
             0x01,
             message.size(),
@@ -138,7 +142,7 @@ namespace smart_home::playground::commands {
         > packet = handler.serialize(&requestMessage);
 
         if (packet->getIsSuccess()) {
-            std::string messageRaw{
+            const std::string messageRaw{
                 packet->getSerializationState()->begin(),
                 packet->getSerializationState()->end()
             };

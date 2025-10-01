@@ -23,7 +23,7 @@ namespace smart_home::usp_protocol::version1 {
         appendStatus(&resultBuffer, message->status);
         appendPacketsCount(&resultBuffer, message->packetsCount);
         appendPacketIndex(&resultBuffer, message->packetIndex);
-        appendSize(&resultBuffer, message->data.size());
+        appendSize(&resultBuffer, static_cast<uint8_t>(message->data.size()));
 
         return std::make_unique<ResponseSerializationResult>(
             ResponseSerializationResult{

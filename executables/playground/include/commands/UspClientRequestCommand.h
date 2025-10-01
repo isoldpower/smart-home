@@ -3,6 +3,7 @@
 #include <smart_home/utilities/include/patterns/PresentableCommand.h>
 #include <netinet/in.h>
 #include <string>
+#include <memory>
 
 
 namespace smart_home::playground::commands {

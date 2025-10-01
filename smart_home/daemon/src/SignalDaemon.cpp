@@ -30,6 +30,13 @@ namespace smart_home::daemon {
             SignalDaemon::shutdown();
         }
 
+        if (shutdownThread.joinable() && !isForcedShutdown.load()) {
+            shutdownThread.join();
+        } else {
+            std::cout << "Detaching shutdown thread" << std::endl;
+            shutdownThread.detach();
+        }
+
         freeSingletonInstance();
     }
 

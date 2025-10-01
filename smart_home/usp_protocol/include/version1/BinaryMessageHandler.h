@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include "./MessageBasisHandler.h"
 #include "../ExecutionCodes.h"
@@ -81,5 +82,4 @@ namespace smart_home::usp_protocol::version1 {
             delete basisHandler;
         }
     };
-
 } // namespace smart_home::usp_protocol::version1

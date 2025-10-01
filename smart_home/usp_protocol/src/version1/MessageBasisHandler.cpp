@@ -3,8 +3,8 @@
 #include <smart_home/utilities/include/exceptions/LevelException.h>
 #include <smart_home/utilities/include/BinaryReader.h>
 #include <iostream>
-#include <ostream>
 #include <string>
+#include <cstring>
 
 #include "../../include/ExecutionCodes.h"
 #include "../../include/exceptions/ProtocolPacketException.h"

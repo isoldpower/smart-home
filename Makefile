@@ -18,6 +18,8 @@ rebuild-debug:
 	$(MAKE) rebuild BUILD_TYPE=Debug
 rebuild-release:
 	$(MAKE) rebuild BUILD_TYPE=Release
+#leak-check:
+#	valgrind --track-origins=yes --leak-check=full ./program
 
 test:
 	if ! test -d "$(BUILD_DIR)"; then "$(MAKE)" rebuild-debug; fi

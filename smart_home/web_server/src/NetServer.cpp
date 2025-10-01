@@ -6,8 +6,10 @@
 
 #include <iostream>
 #include <ostream>
+#include <cstring>
 
 #include "../include/ExitCodes.h"
+
 
 namespace smart_home::web_server {
 

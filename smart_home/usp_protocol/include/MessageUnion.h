@@ -5,6 +5,8 @@
 #include "./version1/request/RequestMessageHandler.h"
 #include "./version1/response/ResponseMessageHandler.h"
 
+#include <variant>
+
 
 namespace smart_home::usp_protocol {
 

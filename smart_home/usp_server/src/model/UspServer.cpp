@@ -7,6 +7,7 @@
 
 
 namespace smart_home::usp_server {
+
     UspServer::UspServer(const UspServerConfig& config)
         : netServer(web_server::NetServerConfig{ config.host, config.port })
         , requestPacketPoller(config.requestPacketPoller)

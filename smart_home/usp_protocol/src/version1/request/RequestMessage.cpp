@@ -6,11 +6,11 @@
 namespace smart_home::usp_protocol::version1 {
 
     RequestMessageData::RequestMessageData(
-        std::string  auth,
+        std::string auth,
         const uint8_t& actionGroup,
         const uint8_t& action,
         const size_t& size,
-        std::string  data
+        std::string data
     )
         : auth(std::move(auth))
         , actionGroup(actionGroup)

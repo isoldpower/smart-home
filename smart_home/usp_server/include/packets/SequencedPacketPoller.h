@@ -1,6 +1,9 @@
 #pragma once
 
 #include <map>
+#include <algorithm>
+#include <string>
+#include <iostream>
 
 #include "./SplitMessage.h"
 #include "./PacketPoller.h"
