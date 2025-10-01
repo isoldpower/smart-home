@@ -12,7 +12,10 @@ message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
 # Libraries list
 add_library(cxx_setup INTERFACE
         smart_home/daemon
-        smart_home/utilities)
+        smart_home/utilities
+        smart_home/usp_protocol
+        smart_home/web_server
+        smart_home/usp_server)
 
 # General compiler options
 if (MSVC)
@@ -21,10 +24,9 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(cxx_setup INTERFACE -Wall -Wextra -Wpedantic)
 endif()
 
-target_compile_features(cxx_setup
-        INTERFACE cxx_std_17)
-target_include_directories(cxx_setup
-        INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_CXX_STANDARD 20)
+target_compile_features(cxx_setup INTERFACE cxx_std_20)
+target_include_directories(cxx_setup INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Subdirectories
 add_subdirectory(external)

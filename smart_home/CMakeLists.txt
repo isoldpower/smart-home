@@ -1,2 +1,6 @@
 add_subdirectory(utilities)
+add_subdirectory(web_server)
 add_subdirectory(daemon)
+
+add_subdirectory(usp_protocol)
+add_subdirectory(usp_server)

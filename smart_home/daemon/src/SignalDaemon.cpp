@@ -30,7 +30,20 @@ namespace smart_home::daemon {
             SignalDaemon::shutdown();
         }
 
+        if (shutdownThread.joinable() && !isForcedShutdown.load()) {
+            shutdownThread.join();
+        }
+
         freeSingletonInstance();
+    }
+
+    void SignalDaemon::bootstrap() {
+        isRunning.store(true);
+        for (const int signalIterator : signalsHandled) {
+            signal(signalIterator, SignalDaemon::handleShutdownSignal);
+        }
+
+        std::cout << "Process is running. Press Ctrl + C to quit." << std::endl;
     }
 
     void SignalDaemon::shutdown() {
@@ -46,22 +59,11 @@ namespace smart_home::daemon {
         }
     }
 
-    void SignalDaemon::bootstrap() {
-        isRunning.store(true);
-        for (const int signalIterator : signalsHandled) {
-            signal(signalIterator, SignalDaemon::handleShutdownSignal);
-        }
-
-        std::cout << "Process is running. Press Ctrl + C to quit." << std::endl;
-    }
-
     void SignalDaemon::waitForShutdown() {
-        if (!isShuttingDown.load()) {
+        if (!isShuttingDown.load() && !shutdownThread.joinable()) {
             std::cerr << "Daemon is not shutting down. Cannot wait for shutdown." << std::endl;
             return;
-        }
-
-        if (shutdownThread.joinable()) {
+        } else if (shutdownThread.joinable()) {
             shutdownThread.join();
         } else {
             std::cerr << "Shutdown thread is not joinable. Exiting now." << std::endl;
@@ -98,7 +100,7 @@ namespace smart_home::daemon {
                 runningDaemon->shutdown();
             }
 
-            std::free(runningDaemon);
+            delete runningDaemon;
             Singleton::setInstance(nullptr);
         }
     }
@@ -113,6 +115,8 @@ namespace smart_home::daemon {
 
         std::cout << "- Updating instance state to idle" << std::endl;
         isRunning.store(false);
+        isForcedShutdown.store(false);
+        isShuttingDown.store(false);
         std::cout << "Cleanup completed. Exiting now." << std::endl;
 
         onAfterShutdown();

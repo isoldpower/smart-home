@@ -1,6 +1,7 @@
 #pragma once
 
 namespace smart_home::daemon {
+
     class DaemonProcess {
     public:
         virtual ~DaemonProcess() = default;

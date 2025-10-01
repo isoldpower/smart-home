@@ -1,5 +1,8 @@
 add_library(utilities STATIC
-        src/placeholder.cpp)
+        src/exceptions/CodeException.cpp
+        src/exceptions/CompleteException.cpp
+        src/exceptions/LevelException.cpp
+        src/exceptions/ExceptionsLoggerShell.cpp)
 
 if (BUILD_TESTING)
     add_executable(utilities_tests tests/main.cpp)
