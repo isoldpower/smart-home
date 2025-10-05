@@ -2,9 +2,6 @@
 
 #include <smart_home/usp_server/include/version1/UspServerRequest.h>
 #include <smart_home/usp_server/include/version1/UspServerResponse.h>
-#include <smart_home/daemon/include/Daemon.h>
-#include <smart_home/daemon/include/DaemonRunner.h>
-#include <smart_home/daemon/include/SignalDaemon.h>
 #include <smart_home/usp_server/include/version1/UspAsyncServer.h>
 #include <smart_home/utilities/include/TypesHelper.h>
 

@@ -4,6 +4,7 @@
 #include <smart_home/daemon/include/SignalDaemon.h>
 #include <smart_home/web_server/include/NetServer.h>
 #include <thread>
+#include <iostream>
 
 #include "./UspServerClient.h"
 #include "./UspServerConfig.h"
@@ -45,6 +46,7 @@ namespace smart_home::usp_server {
             , handler(std::move(onRequest))
             , config(config)
         {}
+
         virtual ~UspServer() {
             stopServer();
         }

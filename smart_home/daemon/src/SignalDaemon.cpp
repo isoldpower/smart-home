@@ -100,7 +100,6 @@ namespace smart_home::daemon {
                 runningDaemon->shutdown();
             }
 
-            delete runningDaemon;
             Singleton::setInstance(nullptr);
         }
     }
