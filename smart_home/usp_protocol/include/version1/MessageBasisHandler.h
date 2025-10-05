@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../CommonMessageData.h"
 #include "../model/ProtocolBasisHandler.h"
-
+#include "CommonMessageData.h"
 
 namespace smart_home::usp_protocol::version1 {
 

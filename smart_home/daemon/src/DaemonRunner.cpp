@@ -24,6 +24,11 @@ namespace smart_home::daemon {
         underlyingProcess->waitForShutdown();
     }
 
+    void DaemonRunner::stopProcedure() const {
+        underlyingProcess->shutdown();
+        underlyingProcess->waitForShutdown();
+    }
+
     void DaemonRunner::addWrapper(ProcedureWrapper* wrapper) {
         wrappers.push_back(wrapper);
     }

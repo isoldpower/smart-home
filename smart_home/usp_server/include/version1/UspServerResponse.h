@@ -1,13 +1,14 @@
 #pragma once
 
+#include <smart_home/usp_protocol/include/version1/CommonMessageData.h>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
+#include <ostream>
 
 
 namespace smart_home::usp_server {
 
     using namespace smart_home::usp_protocol;
 
-    // TODO: Fix that server is hardly bounded to specific response version
     struct UspServerResponse
         : public CommonMessageData
         , public version1::ResponseMessageData
@@ -23,5 +24,18 @@ namespace smart_home::usp_server {
             const std::string& data
         );
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const UspServerResponse& res) {
+        os << "version: " << static_cast<int>(res.protocolVersion) << "\n"
+           << "sessionId: " << res.sessionId << "\n"
+           << "type: " << static_cast<int>(res.type) << "\n"
+           << "timestamp: " << res.timestamp << "\n"
+           << "requestId: " << res.requestId << "\n"
+           << "status: " << static_cast<int>(res.status) << "\n"
+           << "size: " << res.size << "\n"
+           << "data: " << res.data << "\n";
+
+        return os;
+    }
 
 } // namespace smart_home::usp_server

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <smart_home/usp_protocol/include/CommonMessageData.h>
+#include <smart_home/usp_protocol/include/version1/CommonMessageData.h>
 #include <smart_home/usp_protocol/include/version1/request/RequestMessage.h>
 #include <ostream>
 
@@ -9,7 +9,6 @@ namespace smart_home::usp_server {
 
     using namespace usp_protocol;
 
-    // TODO: Fix that server is hardly bounded to specific request version
     struct UspServerRequest
         : public CommonMessageData
         , public version1::RequestMessageData

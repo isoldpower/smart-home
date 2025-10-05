@@ -1,5 +1,4 @@
-#include "../include/UspServerResponse.h"
-
+#include "../../include/version1/UspServerResponse.h"
 
 namespace smart_home::usp_server {
 

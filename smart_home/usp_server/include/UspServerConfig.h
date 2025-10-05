@@ -13,8 +13,13 @@ namespace smart_home::usp_server {
     public:
         const char* host;
         const int port;
+        const timeval receiveIterationHang{1, 0};
         packets::PacketPoller<version1::RequestMessage>* requestPacketPoller;
 
-        UspServerConfig(const char* host, int port);
+        UspServerConfig(
+            const char* host,
+            int port,
+            const timeval& receiveIterationHang = {1, 0}
+        );
     };
 } // namespace smart_home::usp_server

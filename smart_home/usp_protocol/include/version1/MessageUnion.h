@@ -1,9 +1,9 @@
 #pragma once
 
-#include "./version1/acknowledgement/AcknowledgementMessageHandler.h"
-#include "./version1/protocol/ProtocolMessageHandler.h"
-#include "./version1/request/RequestMessageHandler.h"
-#include "./version1/response/ResponseMessageHandler.h"
+#include "./acknowledgement/AcknowledgementMessageHandler.h"
+#include "./protocol/ProtocolMessageHandler.h"
+#include "./request/RequestMessageHandler.h"
+#include "./response/ResponseMessageHandler.h"
 
 #include <variant>
 

@@ -1,4 +1,4 @@
-#include "../include/CommonMessageData.h"
+#include "../../include/version1/CommonMessageData.h"
 
 
 namespace smart_home::usp_protocol {

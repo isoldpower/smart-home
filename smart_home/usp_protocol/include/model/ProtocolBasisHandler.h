@@ -2,8 +2,7 @@
 
 #include <memory>
 
-#include "../CommonMessageData.h"
-
+#include "../version1/CommonMessageData.h"
 
 namespace smart_home::usp_protocol::model {
 

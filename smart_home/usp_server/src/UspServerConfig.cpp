@@ -7,10 +7,12 @@ namespace smart_home::usp_server {
 
     UspServerConfig::UspServerConfig(
         const char* host,
-        int port
+        const int port,
+        const timeval& receiveIterationHang
     )
         : host(host)
         , port(port)
+        , receiveIterationHang(receiveIterationHang)
         , requestPacketPoller(
             new packets::SequencedPacketPoller<version1::RequestMessage>()
         )

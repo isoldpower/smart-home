@@ -1,7 +1,7 @@
 add_library(usp_protocol STATIC
-        src/CommonMessageData.cpp
+        src/version1/CommonMessageData.cpp
         src/MessageHandlerBuilder.cpp
-        src/MessageUnion.cpp
+        src/version1/MessageUnion.cpp
         src/version1/acknowledgement/AcknowledgementMessage.cpp
         src/version1/acknowledgement/AcknowledgementMessageHandler.cpp
         src/version1/request/RequestMessage.cpp

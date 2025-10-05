@@ -1,7 +1,8 @@
-#include "../include/MessageUnion.h"
+#include "../../include/version1/MessageUnion.h"
 
-#include <smart_home/usp_protocol/include/exceptions/ProtocolPacketException.h>
 #include <iostream>
+
+#include "../../include/exceptions/ProtocolPacketException.h"
 
 
 namespace smart_home::usp_protocol {
