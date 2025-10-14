@@ -11,14 +11,14 @@
 namespace smart_home::playground::commands {
 
     void handleRootEndpoint(
-        const usp_server::UspServerRequest&,
-        usp_server::UspServerResponse&
+        const usp_server::version1::UspServerRequest&,
+        usp_server::version1::UspServerResponse&
     ) {
         std::cout << "Handling request to root endpoint..." << std::endl;
     }
 
     int UspServerConfigCommand::execute(int, char*[]) {
-        usp_server::UspAsyncServer uspServer(
+        usp_server::version1::UspAsyncServer uspServer(
             { "localhost", 12345 },
             handleRootEndpoint
         );

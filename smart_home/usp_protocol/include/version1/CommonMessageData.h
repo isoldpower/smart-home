@@ -6,7 +6,7 @@
 #include "../CommonOptions.h"
 
 
-namespace smart_home::usp_protocol {
+namespace smart_home::usp_protocol::version1 {
 
     enum class CommonMessageIndexes : size_t {
         VERSION_BYTE = 0,
@@ -17,6 +17,8 @@ namespace smart_home::usp_protocol {
         REQUEST_ID_END = 5,
         TIMESTAMP_START = 6,
         TIMESTAMP_END = 13,
+        PACKET_INDEX_BYTE = 14,
+        PACKETS_COUNT_BYTE = 15,
     };
 
     consteval size_t getCommonMessageIndex(const CommonMessageIndexes& index) {
@@ -33,19 +35,8 @@ namespace smart_home::usp_protocol {
 
     enum MessageSettings : size_t {
         MAX_PACKET_SIZE = 4096,
-        COMMON_PACKET_SIZE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END),
-        MIN_PACKET_SIZE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END)
-    };
-
-    struct PacketMessage {
-    public:
-        size_t packetsCount;
-        size_t packetIndex;
-
-        PacketMessage(
-            const size_t& packetsCount,
-            const size_t& packetIndex
-        );
+        COMMON_PACKET_SIZE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 1,
+        MIN_PACKET_SIZE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 1
     };
 
     struct CommonMessageData {
@@ -65,19 +56,23 @@ namespace smart_home::usp_protocol {
         );
     };
 
-    struct CommonPacketMessageData
+    struct CommonMessagePacketData
         : public CommonMessageData
-        , public PacketMessage
     {
     public:
-        CommonPacketMessageData(
+        size_t packetIndex;
+        size_t packetsCount;
+
+        CommonMessagePacketData(
             const ProtocolVersion& protocolVersion,
             const uint16_t& sessionId,
             const MessageType& messageType,
-            const std::time_t& timestamp,
+            const uint64_t& timestamp,
             const uint16_t& requestId,
-            const size_t& packetsCount,
-            const size_t& packetIndex
+            size_t packetIndex,
+            size_t packetsCount
         );
     };
-} // namespace smart_home::usp_protocol::messages
+
+
+} // namespace smart_home::usp_protocol::version1

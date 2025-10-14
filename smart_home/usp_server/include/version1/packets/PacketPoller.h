@@ -3,7 +3,7 @@
 #include <vector>
 
 
-namespace smart_home::usp_server::packets {
+namespace smart_home::usp_server::version1::packets {
 
     template <typename TPacket>
     class PacketPoller {
@@ -14,4 +14,4 @@ namespace smart_home::usp_server::packets {
         virtual std::vector<TPacket*> getAllPackets(const std::string& requestId) = 0;
         virtual ssize_t getPacketsCount(const std::string& requestId) = 0;
     };
-} // namespace smart_home::usp_server::packets
+} // namespace smart_home::usp_server::version1::packets

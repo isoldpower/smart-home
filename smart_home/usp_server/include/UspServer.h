@@ -59,6 +59,10 @@ namespace smart_home::usp_server {
         virtual void tryReceiveMessage(
             const timeval& timeout
         ) = 0;
+        virtual void proceedMessage(
+            const char* buffer,
+            size_t length
+        ) = 0;
 
         void startServer() {
             if (serverThread.joinable()) {

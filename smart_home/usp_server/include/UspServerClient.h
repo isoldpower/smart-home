@@ -1,6 +1,7 @@
 #pragma once
 
-#include "NetServerClientInfo.h"
+#include "./NetServerClientInfo.h"
+
 
 namespace smart_home::usp_server {
 

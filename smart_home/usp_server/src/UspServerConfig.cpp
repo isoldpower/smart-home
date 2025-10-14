@@ -1,7 +1,5 @@
 #include "../include/UspServerConfig.h"
 
-#include "../include/packets/SequencedPacketPoller.h"
-
 
 namespace smart_home::usp_server {
 
@@ -13,8 +11,5 @@ namespace smart_home::usp_server {
         : host(host)
         , port(port)
         , receiveIterationHang(receiveIterationHang)
-        , requestPacketPoller(
-            new packets::SequencedPacketPoller<version1::RequestMessage>()
-        )
     {}
 } // namespace smart_home::usp_server

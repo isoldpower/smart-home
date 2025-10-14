@@ -1,10 +1,14 @@
 add_library(usp_server STATIC
         src/UspServerConfig.cpp
         src/UspServerClient.cpp
+
+        src/exceptions/ReceivedMessageException.cpp
+
+        src/version1/packets/SequencedPacketPoller.cpp
+
         src/version1/UspServerRequest.cpp
         src/version1/UspServerResponse.cpp
         src/version1/UspAsyncServer.cpp
-        src/packets/SequencedPacketPoller.cpp
 )
 
 if (BUILD_TESTING)

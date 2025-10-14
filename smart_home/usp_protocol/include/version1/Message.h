@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../version1/CommonMessageData.h"
+#include "./CommonMessageData.h"
 
-namespace smart_home::usp_protocol::model {
+
+namespace smart_home::usp_protocol::version1 {
 
     class IValidatable {
     public:
@@ -11,7 +12,7 @@ namespace smart_home::usp_protocol::model {
     };
 
     struct Message
-        : public CommonMessageData
+        : public CommonMessagePacketData
         , public IValidatable
     {
         explicit Message(
@@ -19,16 +20,20 @@ namespace smart_home::usp_protocol::model {
             const uint16_t& sessionId,
             const MessageType& messageType,
             const uint64_t& timestamp,
-            const uint16_t& requestId
+            const uint16_t& requestId,
+            const size_t& packetIndex,
+            const size_t& packetsCount
         )
-            : CommonMessageData(
+            : CommonMessagePacketData(
                 protocolVersion,
                 sessionId,
                 messageType,
                 timestamp,
-                requestId
+                requestId,
+                packetIndex,
+                packetsCount
             )
         {}
     };
 
-} // namespace smart_home::usp_protocol::model
+} // namespace smart_home::usp_protocol::version1

@@ -8,24 +8,24 @@
 #include <variant>
 
 
-namespace smart_home::usp_protocol {
+namespace smart_home::usp_protocol::version1 {
 
     struct MessageUnion {
     private:
         std::variant<
-            std::unique_ptr<version1::RequestDeserializationResult>,
-            std::unique_ptr<version1::ResponseDeserializationResult>,
-            std::unique_ptr<version1::AcknowledgementDeserializationResult>,
-            std::unique_ptr<version1::ProtocolDeserializationResult>
+            std::unique_ptr<RequestDeserializationResult>,
+            std::unique_ptr<ResponseDeserializationResult>,
+            std::unique_ptr<AcknowledgementDeserializationResult>,
+            std::unique_ptr<ProtocolDeserializationResult>
         > referencePointer;
     public:
         MessageType type;
         bool constructedSuccessfully;
         union {
-            version1::RequestMessage* requestMessage;
-            version1::ResponseMessage* responseMessage;
-            version1::AcknowledgementMessage* acknowledgementMessage;
-            version1::ProtocolMessage* protocolMessage;
+            RequestMessage* requestMessage;
+            ResponseMessage* responseMessage;
+            AcknowledgementMessage* acknowledgementMessage;
+            ProtocolMessage* protocolMessage;
         } messageVariants;
 
         MessageUnion(
@@ -37,4 +37,4 @@ namespace smart_home::usp_protocol {
         ~MessageUnion() = default;
     };
 
-} // namespace smart_home::usp_protocol
+} // namespace smart_home::usp_protocol::version1

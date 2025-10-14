@@ -67,6 +67,8 @@ namespace smart_home::playground::commands {
             322,
             static_cast<uint64_t>(time(nullptr)),
             12301,
+            0,
+            3,
             usp_protocol::version1::AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
             message.size(),
             message
@@ -95,6 +97,8 @@ namespace smart_home::playground::commands {
             322,
             static_cast<uint64_t>(time(nullptr)),
             12301,
+            0,
+            3,
             usp_protocol::version1::ProtocolAction::ACTION_HEARTBEAT,
             message.size(),
             message
@@ -106,7 +110,7 @@ namespace smart_home::playground::commands {
         > packet = handler.serialize(&protocolMessage);
 
         if (packet->getIsSuccess()) {
-            std::string messageRaw{
+            const std::string messageRaw{
                 packet->getSerializationState()->begin(),
                 packet->getSerializationState()->end()
             };
@@ -127,8 +131,8 @@ namespace smart_home::playground::commands {
             322,
             static_cast<uint64_t>(time(nullptr)),
             12301,
-            1,
             0,
+            3,
             authEmpty,
             0x01,
             0x01,
@@ -160,8 +164,8 @@ namespace smart_home::playground::commands {
             322,
             static_cast<uint64_t>(time(nullptr)),
             12301,
-            1,
             0,
+            3,
             usp_protocol::version1::ResponseStatus::STATUS_OK,
             message.size(),
             message

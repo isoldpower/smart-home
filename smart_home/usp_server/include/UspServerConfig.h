@@ -2,8 +2,6 @@
 
 #include <smart_home/usp_protocol/include/version1/request/RequestMessage.h>
 
-#include "./packets/PacketPoller.h"
-
 
 namespace smart_home::usp_server {
 
@@ -14,7 +12,6 @@ namespace smart_home::usp_server {
         const char* host;
         const int port;
         const timeval receiveIterationHang{1, 0};
-        packets::PacketPoller<version1::RequestMessage>* requestPacketPoller;
 
         UspServerConfig(
             const char* host,

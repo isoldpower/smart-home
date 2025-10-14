@@ -8,7 +8,7 @@
 #include "./UspServerResponse.h"
 
 
-namespace smart_home::usp_server {
+namespace smart_home::usp_server::version1 {
 
     class UspAsyncServer
         : public UspServer<UspServerRequest, UspServerResponse>
@@ -30,5 +30,10 @@ namespace smart_home::usp_server {
         void tryReceiveMessage(
             const timeval& timeout
         ) override;
+
+        void proceedMessage(
+            const char* buffer,
+            size_t length
+        ) override;
     };
-} // namespace smart_home::usp_server
+} // namespace smart_home::usp_server::version1

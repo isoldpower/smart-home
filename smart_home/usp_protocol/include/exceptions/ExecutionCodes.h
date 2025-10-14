@@ -1,6 +1,7 @@
 #pragma once
 
-namespace smart_home::usp_protocol {
+
+namespace smart_home::usp_protocol::exceptions {
 
     enum class ExecutionCodes : int {
         RECEIVED_PACKAGE_SIZE_ERROR = -101,
@@ -16,4 +17,4 @@ namespace smart_home::usp_protocol {
     consteval int castedExecutionCode(ExecutionCodes code) {
         return static_cast<int>(code);
     }
-} // namespace smart_home::usp_protocol
+} // namespace smart_home::usp_protocol::exceptions

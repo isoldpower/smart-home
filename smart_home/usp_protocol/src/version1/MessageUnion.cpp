@@ -5,7 +5,7 @@
 #include "../../include/exceptions/ProtocolPacketException.h"
 
 
-namespace smart_home::usp_protocol {
+namespace smart_home::usp_protocol::version1 {
 
     MessageUnion::MessageUnion(
         const CommonMessageData& commonData,
@@ -72,11 +72,13 @@ namespace smart_home::usp_protocol {
             }
             default: {
                 throw exceptions::ProtocolPacketException(
-                    exceptions::ExceptionLevel::ERROR,
-                    castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_UNKNOWN_TYPE),
+                    utilities::exceptions::ExceptionLevel::ERROR,
+                    exceptions::castedExecutionCode(
+                        exceptions::ExecutionCodes::RECEIVED_PACKAGE_UNKNOWN_TYPE
+                    ),
                     "Unknown message type received"
                 );
             }
         }
     }
-} // namespace smart_home::usp_protocol
+} // namespace smart_home::usp_protocol::version1

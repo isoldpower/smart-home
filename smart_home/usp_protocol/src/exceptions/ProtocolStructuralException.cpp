@@ -4,7 +4,7 @@
 namespace smart_home::usp_protocol::exceptions {
 
     ProtocolStructuralException::ProtocolStructuralException (
-        const ExceptionLevel level,
+        const utilities::exceptions::ExceptionLevel level,
         const int errorCode,
         const char* message
     )

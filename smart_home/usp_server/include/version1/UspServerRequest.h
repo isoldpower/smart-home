@@ -5,19 +5,17 @@
 #include <ostream>
 
 
-namespace smart_home::usp_server {
-
-    using namespace usp_protocol;
+namespace smart_home::usp_server::version1 {
 
     struct UspServerRequest
-        : public CommonMessageData
-        , public version1::RequestMessageData
+        : public usp_protocol::version1::CommonMessageData
+        , public usp_protocol::version1::RequestMessageData
     {
     public:
         UspServerRequest(
-            const ProtocolVersion& protocolVersion,
+            const usp_protocol::ProtocolVersion& protocolVersion,
             const uint16_t& sessionId,
-            const MessageType& messageType,
+            const usp_protocol::version1::MessageType& messageType,
             const time_t& timestamp,
             const uint16_t& requestId,
             const std::string& auth,
@@ -43,4 +41,4 @@ namespace smart_home::usp_server {
            << "data: " << req.data << "\n";
         return os;
     }
-} // namespace smart_home::usp_server
+} // namespace smart_home::usp_server::version1

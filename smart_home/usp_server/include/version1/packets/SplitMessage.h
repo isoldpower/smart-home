@@ -1,10 +1,9 @@
 #pragma once
 
 #include <concepts>
-#include <cstdint>
 
 
-namespace smart_home::usp_server::packets {
+namespace smart_home::usp_server::version1::packets {
 
     namespace detail {
         template<typename> struct member_pointer_traits;
@@ -29,4 +28,4 @@ namespace smart_home::usp_server::packets {
         } &&
         CountOrIndexType<typename detail::member_pointer_traits<decltype(&T::packetsCount)>::member_type> &&
         CountOrIndexType<typename detail::member_pointer_traits<decltype(&T::packetIndex)>::member_type>;
-} // namespace smart_home::usp_server::packets
+} // namespace smart_home::usp_server::version1::packets

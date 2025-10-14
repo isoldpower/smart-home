@@ -8,6 +8,8 @@ namespace smart_home::usp_protocol::version1 {
         const uint16_t& sessionId,
         const uint64_t& timestamp,
         const uint16_t& requestId,
+        const size_t& packetIndex,
+        const size_t& packetsCount,
         const AcknowledgementStatus& status,
         const size_t& size,
         std::string data
@@ -17,7 +19,9 @@ namespace smart_home::usp_protocol::version1 {
             sessionId,
             MessageType::MESSAGE_ACKNOWLEDGEMENT,
             timestamp,
-            requestId
+            requestId,
+            packetIndex,
+            packetsCount
         )
         , status(status)
         , size(size)

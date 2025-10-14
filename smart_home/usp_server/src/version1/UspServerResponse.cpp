@@ -1,20 +1,20 @@
 #include "../../include/version1/UspServerResponse.h"
 
-namespace smart_home::usp_server {
+namespace smart_home::usp_server::version1 {
 
     UspServerResponse::UspServerResponse(
-        const ProtocolVersion& protocolVersion,
+        const usp_protocol::ProtocolVersion& protocolVersion,
         const uint16_t& sessionId,
         const time_t& timestamp,
         const uint16_t& requestId,
-        const version1::ResponseStatus& status,
+        const usp_protocol::version1::ResponseStatus& status,
         const size_t& size,
         const std::string& data
     )
-        : CommonMessageData(
+        : usp_protocol::version1::CommonMessageData(
             protocolVersion,
             sessionId,
-            MessageType::MESSAGE_RESPONSE,
+            usp_protocol::version1::MessageType::MESSAGE_RESPONSE,
             timestamp,
             requestId
         )
@@ -24,4 +24,4 @@ namespace smart_home::usp_server {
             data
         )
     {}
-} // namespace smart_home::usp_server
+} // namespace smart_home::usp_server::version1

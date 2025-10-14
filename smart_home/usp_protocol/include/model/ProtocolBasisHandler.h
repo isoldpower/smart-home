@@ -2,16 +2,19 @@
 
 #include <memory>
 
-#include "../version1/CommonMessageData.h"
 
 namespace smart_home::usp_protocol::model {
 
+    template <typename T>
     class ProtocolBasisHandler {
     public:
         virtual ~ProtocolBasisHandler() = default;
-        virtual CommonMessageData parseCommonData(const char* buffer, size_t length) const = 0;
+        virtual T parseCommonData(
+            const char* buffer,
+            size_t length
+        ) const = 0;
         virtual std::unique_ptr<char[]> serializeCommonData(
-            const CommonMessageData& data,
+            const T& data,
             size_t& outSize
         ) const = 0;
     };

@@ -5,21 +5,19 @@
 #include <ostream>
 
 
-namespace smart_home::usp_server {
-
-    using namespace smart_home::usp_protocol;
+namespace smart_home::usp_server::version1 {
 
     struct UspServerResponse
-        : public CommonMessageData
-        , public version1::ResponseMessageData
+        : public usp_protocol::version1::CommonMessageData
+        , public usp_protocol::version1::ResponseMessageData
     {
     public:
         UspServerResponse(
-            const ProtocolVersion& protocolVersion,
+            const usp_protocol::ProtocolVersion& protocolVersion,
             const uint16_t& sessionId,
             const time_t& timestamp,
             const uint16_t& requestId,
-            const version1::ResponseStatus& status,
+            const usp_protocol::version1::ResponseStatus& status,
             const size_t& size,
             const std::string& data
         );
@@ -38,4 +36,4 @@ namespace smart_home::usp_server {
         return os;
     }
 
-} // namespace smart_home::usp_server
+} // namespace smart_home::usp_server::version1

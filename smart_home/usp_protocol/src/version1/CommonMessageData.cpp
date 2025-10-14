@@ -1,15 +1,7 @@
 #include "../../include/version1/CommonMessageData.h"
 
 
-namespace smart_home::usp_protocol {
-
-    PacketMessage::PacketMessage(
-        const size_t& packetsCount,
-        const size_t& packetIndex
-    )
-        : packetsCount(packetsCount)
-        , packetIndex(packetIndex)
-    {}
+namespace smart_home::usp_protocol::version1 {
 
     CommonMessageData::CommonMessageData(
         const ProtocolVersion& protocolVersion,
@@ -25,14 +17,14 @@ namespace smart_home::usp_protocol {
         , requestId(requestId)
     {}
 
-    CommonPacketMessageData::CommonPacketMessageData(
+    CommonMessagePacketData::CommonMessagePacketData(
         const ProtocolVersion& protocolVersion,
         const uint16_t& sessionId,
         const MessageType& messageType,
-        const std::time_t& timestamp,
+        const uint64_t& timestamp,
         const uint16_t& requestId,
-        const size_t& packetsCount,
-        const size_t& packetIndex
+        const size_t packetIndex,
+        const size_t packetsCount
     )
         : CommonMessageData(
             protocolVersion,
@@ -41,9 +33,8 @@ namespace smart_home::usp_protocol {
             timestamp,
             requestId
         )
-        , PacketMessage(
-            packetsCount,
-            packetIndex
-        )
+        , packetIndex(packetIndex)
+        , packetsCount(packetsCount)
     {}
-} // namespace smart_home::usp_protocol
+
+} // namespace smart_home::usp_protocol::version1

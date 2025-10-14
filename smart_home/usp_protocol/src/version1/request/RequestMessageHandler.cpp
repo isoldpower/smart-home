@@ -25,8 +25,6 @@ namespace smart_home::usp_protocol::version1 {
         appendAuth(&resultBuffer, message->auth);
         appendData(&resultBuffer, message->data);
         appendGroup(&resultBuffer, message->actionGroup);
-        appendPacketIndex(&resultBuffer, message->packetIndex);
-        appendPacketsCount(&resultBuffer, message->packetsCount);
         appendSize(&resultBuffer, static_cast<uint8_t>(message->data.size()));
 
         return std::make_unique<RequestSerializationResult>(
@@ -40,7 +38,7 @@ namespace smart_home::usp_protocol::version1 {
     std::unique_ptr<RequestDeserializationResult>
         RequestMessageHandler::deserialize(std::vector<char>* buffer)
     {
-        const CommonMessageData baseData = basisHandler->parseCommonData(
+        const CommonMessagePacketData baseData = basisHandler->parseCommonData(
             buffer->data(),
             buffer->size()
         );
@@ -48,13 +46,13 @@ namespace smart_home::usp_protocol::version1 {
         const char* bufferData = buffer->data();
         const size_t dataSize = determineSize(bufferData, bufferSize);
 
-        RequestMessage resultMessage {
+        const RequestMessage resultMessage {
             baseData.protocolVersion,
             baseData.sessionId,
             baseData.timestamp,
             baseData.requestId,
-            determinePacketsCount(bufferData, bufferSize),
-            determinePacketIndex(bufferData, bufferSize),
+            baseData.packetIndex,
+            baseData.packetsCount,
             determineAuth(bufferData, bufferSize),
             determineGroup(bufferData, bufferSize),
             determineAction(bufferData, bufferSize),
@@ -76,13 +74,17 @@ namespace smart_home::usp_protocol::version1 {
         if (length <= authEndIndex) {
             throw exceptions::ProtocolStructuralException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Auth segment value."
             );
         } else if constexpr (authEndIndex - authStartIndex + 1 != sizeof(uint32_t)) {
             throw exceptions::ProtocolSerializationException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::WRONG_VERSION_STRUCTURE),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::WRONG_VERSION_STRUCTURE
+                ),
                 "Auth size mismatch between passed type size and space available in the protocol message structure."
             );
         } else {
@@ -96,7 +98,9 @@ namespace smart_home::usp_protocol::version1 {
         if (length <= groupIndex) {
             throw exceptions::ProtocolStructuralException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Group segment value."
             );
         } else {
@@ -110,7 +114,9 @@ namespace smart_home::usp_protocol::version1 {
         if (length <= actionIndex) {
             throw exceptions::ProtocolStructuralException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Action segment value."
             );
         } else {
@@ -118,46 +124,15 @@ namespace smart_home::usp_protocol::version1 {
         }
     }
 
-    size_t RequestMessageHandler::determinePacketsCount(const char* buffer, size_t length) const {
-        constexpr auto packetsCountIndex = static_cast<size_t>(
-            RequestSegmentsIndex::PACKETS_COUNT_BYTE
-        );
-
-        if (length <= packetsCountIndex) {
-            throw exceptions::ProtocolStructuralException(
-                utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
-                "Buffer length is too small to determine Packets Count segment value."
-            );
-        } else {
-            return utilities::BigEndianReader::bytesToUint8(&buffer[packetsCountIndex]);
-        }
-    }
-
-    size_t RequestMessageHandler::determinePacketIndex(const char* buffer, size_t length) const {
-        constexpr auto packetIndexIndex = static_cast<size_t>(
-            RequestSegmentsIndex::PACKET_INDEX_BYTE
-        );
-
-        if (length <= packetIndexIndex) {
-            throw exceptions::ProtocolStructuralException(
-                utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
-                "Buffer length is too small to determine Packet Index segment value."
-            );
-        } else {
-            return utilities::BigEndianReader::bytesToUint8(&buffer[packetIndexIndex]);
-        }
-    }
-
-
     size_t RequestMessageHandler::determineSize(const char* buffer, size_t length) const {
         constexpr auto sizeIndex = static_cast<size_t>(RequestSegmentsIndex::SIZE_BYTE);
 
         if (length <= sizeIndex) {
             throw exceptions::ProtocolStructuralException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Size segment value."
             );
         } else {
@@ -171,7 +146,9 @@ namespace smart_home::usp_protocol::version1 {
         if (length <= dataIndex) {
             throw exceptions::ProtocolStructuralException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Data segment value."
             );
         } else {
@@ -216,34 +193,6 @@ namespace smart_home::usp_protocol::version1 {
         const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(action);
 
         appendMultiByteField(buffer, actionByte, 1, valueBytes.get());
-    }
-
-    void RequestMessageHandler::appendPacketIndex(
-        std::vector<char>* buffer,
-        const size_t packetIndex
-    ) const {
-        constexpr size_t packetIndexByte = getRequestSegmentIndex(
-            RequestSegmentsIndex::PACKET_INDEX_BYTE
-        );
-        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
-            static_cast<uint8_t>(packetIndex)
-        );
-
-        appendMultiByteField(buffer, packetIndexByte, 1, valueBytes.get());
-    }
-
-    void RequestMessageHandler::appendPacketsCount(
-        std::vector<char>* buffer,
-        const size_t packetsCount
-    ) const {
-        constexpr size_t packetsCountByte = getRequestSegmentIndex(
-            RequestSegmentsIndex::PACKETS_COUNT_BYTE
-        );
-        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
-            static_cast<uint8_t>(packetsCount)
-        );
-
-        appendMultiByteField(buffer, packetsCountByte, 1, valueBytes.get());
     }
 
     void RequestMessageHandler::appendSize(

@@ -8,16 +8,20 @@ namespace smart_home::usp_protocol::version1 {
         const uint16_t& sessionId,
         const uint64_t& timestamp,
         const uint16_t& requestId,
+        const size_t& packetIndex,
+        const size_t& packetsCount,
         const ProtocolAction& action,
         const size_t& size,
         std::string data
     )
-        : model::Message(
+        : Message(
             protocolVersion,
             sessionId,
             MessageType::MESSAGE_PROTOCOL,
             timestamp,
-            requestId
+            requestId,
+            packetIndex,
+            packetsCount
         )
         , action(action)
         , size(size)

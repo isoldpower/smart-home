@@ -1,13 +1,13 @@
 #pragma once
 
+#include <algorithm>
 #include <iostream>
 #include <vector>
-#include <algorithm>
 
-#include "./MessageBasisHandler.h"
-#include "../ExecutionCodes.h"
+#include "../exceptions/ExecutionCodes.h"
 #include "../exceptions/ProtocolAllocationException.h"
 #include "../model/ProtocolMessageHandler.h"
+#include "./MessageBasisHandler.h"
 
 
 namespace smart_home::usp_protocol::version1 {
@@ -29,8 +29,10 @@ namespace smart_home::usp_protocol::version1 {
                     + ", capacity: "
                     + std::to_string(buffer->capacity());
                 const auto exception = exceptions::ProtocolAllocationException(
-                    exceptions::ExceptionLevel::WARNING,
-                    castedExecutionCode(ExecutionCodes::INEFFICIENT_MEMORY_ALLOCATION),
+                    utilities::exceptions::ExceptionLevel::WARNING,
+                    exceptions::castedExecutionCode(
+                        exceptions::ExecutionCodes::INEFFICIENT_MEMORY_ALLOCATION
+                    ),
                     warningMessage.c_str()
                 );
 
@@ -43,14 +45,14 @@ namespace smart_home::usp_protocol::version1 {
             }
         }
 
-        void appendBasis(std::vector<char>* buffer, const CommonMessageData& data) const {
+        void appendBasis(std::vector<char>* buffer, const CommonMessagePacketData& data) const {
             size_t basisSize = 0;
             const auto serializedBasis = basisHandler->serializeCommonData(
                 data,
                 basisSize
             );
-            validateBufferAllocations(buffer, basisSize);
 
+            validateBufferAllocations(buffer, basisSize);
             std::copy_n(
                 serializedBasis.get(),
                 basisSize,

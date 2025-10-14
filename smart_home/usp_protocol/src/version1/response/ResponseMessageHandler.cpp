@@ -21,8 +21,6 @@ namespace smart_home::usp_protocol::version1 {
         appendBasis(&resultBuffer, *message);
         appendData(&resultBuffer, message->data);
         appendStatus(&resultBuffer, message->status);
-        appendPacketsCount(&resultBuffer, message->packetsCount);
-        appendPacketIndex(&resultBuffer, message->packetIndex);
         appendSize(&resultBuffer, static_cast<uint8_t>(message->data.size()));
 
         return std::make_unique<ResponseSerializationResult>(
@@ -36,7 +34,7 @@ namespace smart_home::usp_protocol::version1 {
     std::unique_ptr<ResponseDeserializationResult>
         ResponseMessageHandler::deserialize(std::vector<char>* buffer)
     {
-        CommonMessageData baseData = basisHandler->parseCommonData(
+        const CommonMessagePacketData baseData = basisHandler->parseCommonData(
             buffer->data(),
             buffer->size()
         );
@@ -49,8 +47,8 @@ namespace smart_home::usp_protocol::version1 {
             baseData.sessionId,
             baseData.timestamp,
             baseData.requestId,
-            determinePacketsCount(bufferData, bufferSize),
-            determinePacketIndex(bufferData, bufferSize),
+            baseData.packetIndex,
+            baseData.packetsCount,
             static_cast<ResponseStatus>(
                 determineStatus(bufferData, bufferSize)
             ),
@@ -65,47 +63,17 @@ namespace smart_home::usp_protocol::version1 {
         return std::make_unique<ResponseDeserializationResult>(result);
     }
 
-    size_t ResponseMessageHandler::determinePacketsCount(const char* buffer, size_t length) const {
-        constexpr auto packetsCountIndex = static_cast<size_t>(
-            ResponseSegmentsIndex::PACKETS_COUNT_BYTE
-        );
-
-        if (length <= packetsCountIndex) {
-            throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
-                "Buffer length is too small to determine Packets Count segment value."
-            );
-        } else {
-            return utilities::BigEndianReader::bytesToUint8(&buffer[packetsCountIndex]);
-        }
-    }
-
-    size_t ResponseMessageHandler::determinePacketIndex(const char* buffer, size_t length) const {
-        constexpr auto packetIndexIndex = static_cast<size_t>(
-            ResponseSegmentsIndex::PACKET_INDEX_BYTE
-        );
-
-        if (length <= packetIndexIndex) {
-            throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
-                "Buffer length is too small to determine Packet Index segment value."
-            );
-        } else {
-            return utilities::BigEndianReader::bytesToUint8(&buffer[packetIndexIndex]);
-        }
-    }
-
-    uint8_t ResponseMessageHandler::determineStatus(const char* buffer, size_t length) const {
+    uint8_t ResponseMessageHandler::determineStatus(const char* buffer, const size_t length) const {
         constexpr auto statusIndex = static_cast<uint8_t>(
             ResponseSegmentsIndex::STATUS_BYTE
         );
 
         if (length <= statusIndex) {
             throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                utilities::exceptions::ExceptionLevel::ERROR,
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Status segment value."
             );
         } else {
@@ -113,13 +81,15 @@ namespace smart_home::usp_protocol::version1 {
         }
     }
 
-    size_t ResponseMessageHandler::determineSize(const char* buffer, size_t length) const {
+    size_t ResponseMessageHandler::determineSize(const char* buffer, const size_t length) const {
         constexpr auto sizeIndex = static_cast<size_t>(ResponseSegmentsIndex::SIZE_BYTE);
 
         if (length <= sizeIndex) {
             throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                utilities::exceptions::ExceptionLevel::ERROR,
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Size segment value."
             );
         } else {
@@ -127,47 +97,21 @@ namespace smart_home::usp_protocol::version1 {
         }
     }
 
-    char* ResponseMessageHandler::parseDataPointer(const char* buffer, size_t length) const {
+    char* ResponseMessageHandler::parseDataPointer(const char* buffer, const size_t length) const {
         constexpr auto dataIndex = static_cast<size_t>(ResponseSegmentsIndex::DATA_START);
 
         if (length <= dataIndex) {
 
             throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                utilities::exceptions::ExceptionLevel::ERROR,
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Data segment value."
             );
         } else {
             return const_cast<char*>(buffer + dataIndex);
         }
-    }
-
-    void ResponseMessageHandler::appendPacketIndex(
-        std::vector<char>* buffer,
-        const size_t packetIndex
-    ) const {
-        constexpr size_t packetIndexByte = getResponseSegmentIndex(
-            ResponseSegmentsIndex::PACKET_INDEX_BYTE
-        );
-        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
-            static_cast<uint8_t>(packetIndex)
-        );
-
-        appendMultiByteField(buffer, packetIndexByte, 1, valueBytes.get());
-    }
-
-    void ResponseMessageHandler::appendPacketsCount(
-        std::vector<char>* buffer,
-        const size_t packetsCount
-    ) const {
-        constexpr size_t packetsCountByte = getResponseSegmentIndex(
-            ResponseSegmentsIndex::PACKETS_COUNT_BYTE
-        );
-        const std::unique_ptr<char[]> valueBytes = utilities::BigEndianReader::uint8ToBytes(
-            static_cast<uint8_t>(packetsCount)
-        );
-
-        appendMultiByteField(buffer, packetsCountByte, 1, valueBytes.get());
     }
 
     void ResponseMessageHandler::appendStatus(

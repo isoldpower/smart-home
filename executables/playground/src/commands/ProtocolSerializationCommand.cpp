@@ -35,6 +35,8 @@ namespace smart_home::playground::commands {
             22233,
             timestamp,
             22233,
+            0,
+            1,
             version1::AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
             size,
             dataToSerialize
@@ -52,8 +54,8 @@ namespace smart_home::playground::commands {
             22233,
             timestamp,
             22233,
-            1,
             0,
+            1,
             "",
             0x01,
             0x01,
@@ -73,8 +75,8 @@ namespace smart_home::playground::commands {
             22233,
             timestamp,
             22233,
-            1,
             0,
+            1,
             version1::ResponseStatus::STATUS_OK,
             size,
             dataToSerialize
@@ -92,6 +94,8 @@ namespace smart_home::playground::commands {
             22233,
             0,
             22233,
+            0,
+            1,
             version1::ProtocolAction::ACTION_HANDSHAKE,
             size,
             dataToSerialize

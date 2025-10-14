@@ -3,8 +3,8 @@
 #include <array>
 #include <string>
 
-#include "../../model/Message.h"
 #include "../BinaryMessage.h"
+#include "../Message.h"
 
 
 namespace smart_home::usp_protocol::version1 {
@@ -18,11 +18,13 @@ namespace smart_home::usp_protocol::version1 {
         REQUEST_ID_END = static_cast<size_t>(CommonMessageIndexes::REQUEST_ID_END),
         TIMESTAMP_START = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_START),
         TIMESTAMP_END = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END),
-        ACTION_BYTE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 1,
-        SIZE_BYTE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 2,
-        DATA_START = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 3,
+        PACKET_INDEX_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKET_INDEX_BYTE),
+        PACKETS_COUNT_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE),
+        ACTION_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 1,
+        SIZE_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 2,
+        DATA_START = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 3,
 
-        internal_SegmentsCount = 8
+        internal_SegmentsCount = 10
     };
 
     consteval size_t getProtocolSegmentIndex(ProtocolSegmentsIndex index) {
@@ -42,7 +44,7 @@ namespace smart_home::usp_protocol::version1 {
         ACTION_UNKNOWN = 0xFF,
     };
 
-    struct ProtocolMessage final : public model::Message {
+    struct ProtocolMessage final : public Message {
     public:
         ProtocolAction action;
         size_t size;
@@ -53,6 +55,8 @@ namespace smart_home::usp_protocol::version1 {
             const uint16_t& sessionId,
             const uint64_t& timestamp,
             const uint16_t& requestId,
+            const size_t& packetIndex,
+            const size_t& packetsCount,
             const ProtocolAction& action,
             const size_t& size,
             std::string data
