@@ -2,6 +2,7 @@
 
 #include <array>
 #include <string>
+#include <ostream>
 
 #include "../BinaryMessage.h"
 #include "../Message.h"
@@ -64,5 +65,22 @@ namespace smart_home::usp_protocol::version1 {
 
         [[nodiscard]] bool isValid() const override;
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const ProtocolMessage& obj) {
+        os << "{\n"
+           << "\tversion: " << static_cast<int>(obj.protocolVersion) << ", \n"
+           << "\ttype: " << static_cast<int>(obj.type) << ", \n"
+           << "\tsessionId: " << obj.sessionId << ", \n"
+           << "\ttimestamp: " << obj.timestamp << ", \n"
+           << "\trequestId: " << obj.requestId << ", \n"
+           << "\tpacketIndex: " << obj.packetIndex << ", \n"
+           << "\tpacketsCount: " << obj.packetsCount << ", \n"
+           << "\taction: " << static_cast<int>(obj.action) << ", \n"
+           << "\tsize: " << obj.size << ", \n"
+           << "\tdata: " << obj.data << "\n"
+           << "}";
+
+        return os;
+    }
 
 } // namespace smart_home::usp_protocol::version1

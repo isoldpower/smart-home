@@ -1,11 +1,14 @@
 #pragma once
 
+#include <smart_home/usp_protocol/include/version1/request/RequestMessage.h>
+#include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
 #include <thread>
 
 #include "../UspServer.h"
 #include "../UspServerConfig.h"
 #include "./UspServerRequest.h"
 #include "./UspServerResponse.h"
+#include "./packets/PacketPoller.h"
 
 
 namespace smart_home::usp_server::version1 {
@@ -33,7 +36,7 @@ namespace smart_home::usp_server::version1 {
 
         void proceedMessage(
             const char* buffer,
-            size_t length
+            const UspServerClient& client
         ) override;
     };
 } // namespace smart_home::usp_server::version1

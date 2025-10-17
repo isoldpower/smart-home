@@ -61,7 +61,7 @@ namespace smart_home::usp_server {
         ) = 0;
         virtual void proceedMessage(
             const char* buffer,
-            size_t length
+            const UspServerClient& client
         ) = 0;
 
         void startServer() {

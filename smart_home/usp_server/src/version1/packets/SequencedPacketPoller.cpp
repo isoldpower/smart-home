@@ -90,5 +90,6 @@ namespace smart_home::usp_server::version1::packets {
         return validPacketsCount && indexesInRange;
     }
 
-
+    template class SequencedPacketPoller<usp_protocol::version1::RequestMessage>;
+    template class SequencedPacketPoller<usp_protocol::version1::ResponseMessage>;
 } // namespace smart_home::usp_server::version1::packets

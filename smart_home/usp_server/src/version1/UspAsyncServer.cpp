@@ -2,7 +2,9 @@
 
 #include <smart_home/usp_protocol/include/version1/MessageBasisHandler.h>
 
-#include "../../include/exceptions/ReceivedMessageException.h"
+#include "../../include/version1/packets/SequencedPacketPoller.h"
+#include "../../include/version1/message_handlers/MessageHandler.h"
+#include "../../include/version1/message_handlers/MessageHandlerBuilder.h"
 
 
 namespace smart_home::usp_server::version1 {
@@ -32,8 +34,10 @@ namespace smart_home::usp_server::version1 {
             timeout
         );
 
+        const UspServerClient uspClient{ client };
+
         if (client.isSuccessful) {
-            proceedMessage(buffer, client.bytesReceived);
+            proceedMessage(buffer, uspClient);
         } else {
             delete[] buffer;
         }
@@ -41,39 +45,15 @@ namespace smart_home::usp_server::version1 {
 
     void UspAsyncServer::proceedMessage(
         const char* buffer,
-        const size_t length
+        const UspServerClient& client
     ) {
         const usp_protocol::version1::MessageBasisHandler basisHandler;
-        const usp_protocol::version1::CommonMessagePacketData commonData = basisHandler.parseCommonData(
-            buffer,
-            length
-        );
+        const usp_protocol::version1::CommonMessagePacketData commonData =
+            basisHandler.parseCommonData(buffer, client.bytesReceived);
 
-        switch (commonData.type) {
-            case usp_protocol::version1::MessageType::MESSAGE_ACKNOWLEDGEMENT:
-                std::cout << "Message acknowledgement" << std::endl;
-                break;
-            case usp_protocol::version1::MessageType::MESSAGE_REQUEST:
-                std::cout << "Message request" << std::endl;
-                break;
-            case usp_protocol::version1::MessageType::MESSAGE_RESPONSE:
-                std::cout << "Message response" << std::endl;
-                break;
-            case usp_protocol::version1::MessageType::MESSAGE_PROTOCOL:
-                std::cout << "Message protocol" << std::endl;
-                break;
-            case usp_protocol::version1::MessageType::MESSAGE_UNKNOWN:
-                throw exceptions::ReceivedMessageException(
-                    exceptions::ExceptionLevel::WARNING,
-                    exceptions::ExecutionCodes::UNKNOWN_MESSAGE_TYPE,
-                    "Received message with unknown type; skipping processing."
-                );
-            default:
-                throw exceptions::ReceivedMessageException(
-                    exceptions::ExceptionLevel::FATAL,
-                    exceptions::ExecutionCodes::UNKNOWN_MESSAGE_TYPE,
-                    "Received message type that is not defined in internal server handling process"
-                );
-        }
+        message_handlers::MessageHandlerBuilder builder;
+        const std::unique_ptr<message_handlers::MessageHandler> handler =
+            builder.buildMessageHandler(commonData);
+        handler->handleMessage(buffer, client);
     }
 } // namespace smart_home::usp_server::version1

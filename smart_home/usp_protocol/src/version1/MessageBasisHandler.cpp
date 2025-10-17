@@ -313,5 +313,4 @@ namespace smart_home::usp_protocol::version1 {
             utilities::BigEndianReader::uint8ToBytes(static_cast<uint8_t>(packetsCount));
         buffer[packetsCountByte] = packetsCountSerialized[0];
     }
-
 } // namespace smart_home::usp_protocol::version1
