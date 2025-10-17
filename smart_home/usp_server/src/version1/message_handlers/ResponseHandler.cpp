@@ -5,8 +5,6 @@
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessageHandler.h>
 
-#include "../../../include/version1/packets/SequencedPacketPoller.h"
-
 
 namespace smart_home::usp_server::version1::message_handlers {
 
