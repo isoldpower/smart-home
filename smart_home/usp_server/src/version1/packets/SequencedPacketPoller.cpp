@@ -3,62 +3,74 @@
 
 namespace smart_home::usp_server::version1::packets {
 
-    template <typename TPacket>
-    ssize_t SequencedPacketPoller<TPacket>::getPacketsCount(const std::string& requestId) {
+    template <typename TRequestId, typename TPacket>
+    ssize_t SequencedPacketPoller<TRequestId, TPacket>::getPacketsCount(
+        const TRequestId& requestId
+    ) {
         if (isSequenceComplete(requestId) == false) {
             return -1;
         }
 
-        return messagePackets[requestId].size();
+        return messagePackets.count(requestId);
     }
 
-    template <typename TPacket>
-    std::vector<TPacket*> SequencedPacketPoller<TPacket>::getAllPackets(const std::string& requestId) {
+    template <typename TRequestId, typename TPacket>
+    std::vector<std::shared_ptr<TPacket>> SequencedPacketPoller<TRequestId, TPacket>::getAllPackets(
+        const TRequestId& requestId
+    ) {
         if (isSequenceComplete(requestId) == false) {
-            return std::vector<TPacket*>{};
+            return std::vector<std::shared_ptr<TPacket>>{};
         }
 
-        std::vector<TPacket*> packets = messagePackets.at(requestId);
-        std::sort(
-            packets.begin(),
-            packets.end(),
-            [](TPacket* a, TPacket* b) {
-                return a->packetIndex < b->packetIndex;
+        auto packetsRange = messagePackets.equal_range(requestId);
+        std::vector<std::shared_ptr<TPacket>> packetsVector;
+        std::transform(
+            packetsRange.first,
+            packetsRange.second,
+            std::back_inserter(packetsVector),
+            [](const PacketEntry& pair) {
+                return pair.second;
             }
         );
 
-        return packets;
+        return packetsVector;
     }
 
-    template <typename TPacket>
-    int SequencedPacketPoller<TPacket>::addPacket(const std::string& requestId, TPacket* packet) {
+    template <typename TRequestId, typename TPacket>
+    int SequencedPacketPoller<TRequestId, TPacket>::addPacket(
+        const TRequestId& requestId,
+        std::shared_ptr<TPacket> packet
+    ) {
         try {
-            if (messagePackets.contains(requestId) == false) {
-                messagePackets.insert({ requestId, std::vector<TPacket*>() });
-            }
-
-            messagePackets.at(requestId).push_back(packet);
-            return packet->packetsCount == messagePackets.at(requestId).size();
+            messagePackets.emplace(requestId, packet);
+            return packet->packetsCount == messagePackets.count(requestId);
         } catch (const std::exception& e) {
             std::cerr << "Error adding packet to poller: " << e.what() << std::endl;
             return -1;
         }
     }
 
-    template <typename TPacket>
-    bool SequencedPacketPoller<TPacket>::isSequenceComplete(const std::string& requestId) {
+    template <typename TRequestId, typename TPacket>
+    bool SequencedPacketPoller<TRequestId, TPacket>::isSequenceComplete(
+        const TRequestId& requestId
+    ) {
         if (messagePackets.contains(requestId) == false) {
             return false;
         }
 
-        const std::vector<TPacket*>& packets = messagePackets[requestId];
+        const auto packetsRange = messagePackets.equal_range(requestId);
+        const size_t packetsCount = std::distance(packetsRange.first, packetsRange.second);
         std::map<size_t, size_t> indexCountMap;
-        for (const auto& iterationPacket : packets) {
-            indexCountMap[iterationPacket->packetIndex] += 1;
-        }
+        std::for_each(
+            packetsRange.first,
+            packetsRange.second,
+            [&indexCountMap](const PacketEntry& pair) {
+                indexCountMap[pair.second->packetIndex] += 1;
+            }
+        );
 
         const bool sequenceValid = isSequenceValid(requestId);
-        const bool allIndexesPresent = indexCountMap.size() == packets[0]->packetsCount;
+        const bool allIndexesPresent = indexCountMap.size() == packetsCount;
         const bool noDuplicateIndexes = std::all_of(
             indexCountMap.begin(),
             indexCountMap.end(),
@@ -70,26 +82,41 @@ namespace smart_home::usp_server::version1::packets {
         return sequenceValid && allIndexesPresent && noDuplicateIndexes;
     }
 
-    template <typename TPacket>
-    bool SequencedPacketPoller<TPacket>::isSequenceValid(const std::string& requestId) {
+    template <typename TRequestId, typename TPacket>
+    bool SequencedPacketPoller<TRequestId, TPacket>::isSequenceValid(
+        const TRequestId& requestId
+    ) {
         if (messagePackets.contains(requestId) == false) {
             return false;
         }
 
-        const std::vector<TPacket*>& packets = messagePackets[requestId];
-        size_t expectedCount = packets[0]->packetsCount;
-        const bool validPacketsCount = packets.size() == expectedCount;
+        auto packetsRange = messagePackets.equal_range(requestId);
+        const size_t detectedPacketsCount = std::distance(
+            packetsRange.first,
+            packetsRange.second
+        );
+        if (detectedPacketsCount == 0) return false;
+
+        const std::shared_ptr<TPacket>& firstPacket = packetsRange.first->second;
+        const size_t expectedPacketsCount = firstPacket->packetsCount;
+
+        const bool validPacketsCount = detectedPacketsCount == expectedPacketsCount;
         const bool indexesInRange = std::all_of(
-            packets.begin(),
-            packets.end(),
-            [expectedCount](TPacket* packet) {
-                return packet->packetIndex < expectedCount && packet->packetIndex >= 0;
+            packetsRange.first,
+            packetsRange.second,
+            [expectedPacketsCount](const PacketEntry& pair) {
+                const std::shared_ptr<TPacket>& packet = pair.second;
+                const bool isValidCount = packet->packetsCount == expectedPacketsCount;
+                const bool isValidIndex =
+                    packet->packetIndex < expectedPacketsCount &&
+                    packet->packetIndex >= 0;
+
+                return isValidCount && isValidIndex;
             }
         );
 
         return validPacketsCount && indexesInRange;
     }
 
-    template class SequencedPacketPoller<usp_protocol::version1::RequestMessage>;
-    template class SequencedPacketPoller<usp_protocol::version1::ResponseMessage>;
+    template class SequencedPacketPoller<uint16_t, ReferencedCommonData>;
 } // namespace smart_home::usp_server::version1::packets

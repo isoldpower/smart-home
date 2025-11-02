@@ -24,7 +24,7 @@ namespace smart_home::usp_protocol::version1 {
 
                 messageVariants.requestMessage = std::get<
                     std::unique_ptr<version1::RequestDeserializationResult>
-                >(referencePointer)->getDeserializationState();
+                >(referencePointer)->getDeserializationState().get();
                 constructedSuccessfully = std::get<
                     std::unique_ptr<version1::RequestDeserializationResult>
                 >(referencePointer)->isSuccess();
@@ -37,7 +37,7 @@ namespace smart_home::usp_protocol::version1 {
 
                 messageVariants.responseMessage = std::get<
                     std::unique_ptr<version1::ResponseDeserializationResult>
-                >(referencePointer)->getDeserializationState();
+                >(referencePointer)->getDeserializationState().get();
                 constructedSuccessfully = std::get<
                     std::unique_ptr<version1::ResponseDeserializationResult>
                 >(referencePointer)->isSuccess();
@@ -50,7 +50,7 @@ namespace smart_home::usp_protocol::version1 {
 
                 messageVariants.acknowledgementMessage = std::get<
                     std::unique_ptr<version1::AcknowledgementDeserializationResult>
-                >(referencePointer)->getDeserializationState();
+                >(referencePointer)->getDeserializationState().get();
                 constructedSuccessfully = std::get<
                     std::unique_ptr<version1::AcknowledgementDeserializationResult>
                 >(referencePointer)->isSuccess();
@@ -63,7 +63,7 @@ namespace smart_home::usp_protocol::version1 {
 
                 messageVariants.protocolMessage = std::get<
                     std::unique_ptr<version1::ProtocolDeserializationResult>
-                >(referencePointer)->getDeserializationState();
+                >(referencePointer)->getDeserializationState().get();
                 constructedSuccessfully = std::get<
                     std::unique_ptr<version1::ProtocolDeserializationResult>
                 >(referencePointer)->isSuccess();

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <smart_home/usp_protocol/include/version1/CommonMessageData.h>
-
 #include <memory>
 
 #include "./MessageHandler.h"

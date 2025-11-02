@@ -2,16 +2,15 @@ add_library(usp_server STATIC
         src/UspServerConfig.cpp
         src/UspServerClient.cpp
 
+        src/exceptions/ReceivedMessageException.cpp
         src/version1/UspServerRequest.cpp
         src/version1/UspServerResponse.cpp
         src/version1/UspAsyncServer.cpp
-
-        src/exceptions/ReceivedMessageException.cpp
-
+        src/version1/ReferencedCommonData.cpp
         src/version1/packets/SequencedPacketPoller.cpp
-
-        src/version1/message_handlers/AcknowledgementHandler.cpp
         src/version1/message_handlers/MessageHandlerBuilder.cpp
+        src/version1/message_handlers/MessageHandler.cpp
+        src/version1/message_handlers/AcknowledgementHandler.cpp
         src/version1/message_handlers/ProtocolHandler.cpp
         src/version1/message_handlers/RequestHandler.cpp
         src/version1/message_handlers/ResponseHandler.cpp

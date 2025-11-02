@@ -8,6 +8,7 @@
 #include "../UspServerConfig.h"
 #include "./UspServerRequest.h"
 #include "./UspServerResponse.h"
+#include "./ReferencedCommonData.h"
 #include "./packets/PacketPoller.h"
 
 
@@ -18,6 +19,12 @@ namespace smart_home::usp_server::version1 {
     {
         using ResponseReactionFunction = std::function<void(const UspServerResponse&)>;
         using HandlerFunction = std::function<void(const UspServerRequest&, UspServerResponse&)>;
+        using CommonPacketPoller = packets::PacketPoller<
+            uint16_t,
+            ReferencedCommonData
+        >;
+    private:
+        std::unique_ptr<CommonPacketPoller> commonPacketPoller;
     public:
         explicit UspAsyncServer(
             const UspServerConfig& config,

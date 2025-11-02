@@ -1,35 +1,53 @@
 #pragma once
 
-#include <smart_home/usp_protocol/include/version1/request/RequestMessage.h>
-#include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
+#include <smart_home/utilities/include/concepts/TypeConcepts.h>
+#include <smart_home/utilities/include/concepts/PointerTraits.h>
 #include <iostream>
 #include <map>
-#include <string>
 
 #include "./PacketPoller.h"
-#include "./SplitMessage.h"
+#include "../ReferencedCommonData.h"
 
 
 namespace smart_home::usp_server::version1::packets {
 
-    template <typename TPacket>
-    class SequencedPacketPoller : public PacketPoller<TPacket> {
+    template<typename T>
+    concept HasPacketIndexation =
+        requires {
+            typename utilities::concepts::member_pointer_traits<decltype(&T::packetsCount)>::member_type;
+            typename utilities::concepts::member_pointer_traits<decltype(&T::packetIndex)>::member_type;
+        } &&
+        utilities::concepts::CountOrIndexType<
+            typename utilities::concepts::member_pointer_traits<
+                decltype(&T::packetsCount)
+            >::member_type> &&
+        utilities::concepts::CountOrIndexType<
+            typename utilities::concepts::member_pointer_traits<
+                decltype(&T::packetIndex)
+            >::member_type>;
+
+
+    template <typename TRequestId, typename TPacket>
+    class SequencedPacketPoller : public PacketPoller<TRequestId, TPacket> {
     static_assert(
         HasPacketIndexation<TPacket>,
         "SequencedPacketPoller TPacket template parameter must have packetsCount and packetIndex members "
         "with correct types."
     );
+        using PacketEntry = std::pair<TRequestId, std::shared_ptr<TPacket>>;
     private:
-        std::map<std::string, std::vector<TPacket*>> messagePackets;
+        std::multimap<TRequestId, std::shared_ptr<TPacket>> messagePackets;
 
-        bool isSequenceValid(const std::string& requestId);
-        bool isSequenceComplete(const std::string& requestId);
+        bool isSequenceValid(const TRequestId& requestId);
     public:
-        int addPacket(const std::string& requestId, TPacket* packet) override;
-        std::vector<TPacket*> getAllPackets(const std::string& requestId) override;
-        ssize_t getPacketsCount(const std::string& requestId) override;
+        int addPacket(const TRequestId& requestId, std::shared_ptr<TPacket> packet) override;
+        std::vector<std::shared_ptr<TPacket>> getAllPackets(const TRequestId& requestId) override;
+        ssize_t getPacketsCount(const TRequestId& requestId) override;
+        bool isSequenceComplete(const TRequestId& requestId) override;
     };
 
-    extern template class SequencedPacketPoller<usp_protocol::version1::RequestMessage>;
-    extern template class SequencedPacketPoller<usp_protocol::version1::ResponseMessage>;
+    extern template class SequencedPacketPoller<
+        uint16_t,
+        ReferencedCommonData
+    >;
 } // namespace smart_home::usp_server::version1::packets

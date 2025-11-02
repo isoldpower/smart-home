@@ -1,6 +1,5 @@
 #include "../../../include/version1/message_handlers/ResponseHandler.h"
 
-
 #include <iostream>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessageHandler.h>
@@ -8,23 +7,39 @@
 
 namespace smart_home::usp_server::version1::message_handlers {
 
-    void ResponseHandler::handleMessage(const char *buffer, UspServerClient client) {
+    FinalResponseMessage::FinalResponseMessage(
+        const std::vector<std::shared_ptr<ReferencedCommonData>> &packets,
+        const std::vector<std::shared_ptr<usp_protocol::version1::ResponseMessage>> &messages
+    )
+        : FinalMessage(packets)
+        , FinalDataMessage(
+            packets,
+            usp_protocol::version1::getResponseSegmentIndex(
+                usp_protocol::version1::ResponseSegmentsIndex::SIZE_BYTE
+            ),
+            usp_protocol::version1::getResponseSegmentIndex(
+                usp_protocol::version1::ResponseSegmentsIndex::DATA_START
+            )
+        )
+    {}
+
+    void ResponseHandler::handleMessage(
+        const std::vector<std::shared_ptr<ReferencedCommonData>>& packets
+    ) {
         usp_protocol::version1::ResponseMessageHandler handler;
-        auto vectorBuffer = std::vector(
-            buffer,
-            buffer + client.bytesReceived
+        const std::vector<std::shared_ptr<
+            usp_protocol::version1::ResponseMessage
+        >> resolvedPackets = buildMessagePackets<usp_protocol::version1::ResponseMessage>(
+            packets,
+            std::make_unique<usp_protocol::version1::ResponseMessageHandler>()
         );
-        const std::unique_ptr<
-            usp_protocol::version1::ResponseDeserializationResult
-        > deserializationResult = handler.deserialize(&vectorBuffer);
+        const FinalResponseMessage finalMessage(
+            packets,
+            resolvedPackets
+        );
 
-        if (deserializationResult->isSuccess()) {
-            const usp_protocol::version1::ResponseMessage* message =
-                deserializationResult->getDeserializationState();
-
-            std::cout << "Message response: " << *message << std::endl;
-        } else {
-            std::cerr << "Error deserializing Response message" << std::endl;
-        }
+        std::cout << "Final Response Message: " << finalMessage.data << std::endl;
+        std::cout << "\tSize: " << finalMessage.size << std::endl;
+        std::cout << "\tData Size: " << finalMessage.data.size() << std::endl;
     }
 } // namespace smart_home::usp_server::version1::message_handlers
