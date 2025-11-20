@@ -1,6 +1,7 @@
 #include "../../../include/version1/message_handlers/ResponseHandler.h"
 
 #include <iostream>
+#include <utility>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessage.h>
 #include <smart_home/usp_protocol/include/version1/response/ResponseMessageHandler.h>
 
@@ -23,15 +24,21 @@ namespace smart_home::usp_server::version1::message_handlers {
         )
     {}
 
+    ResponseHandler::ResponseHandler(
+        std::shared_ptr<utilities::patterns::EventChannel> serverEventChannel
+    )
+        : MessageHandler(std::move(serverEventChannel))
+    {}
+
     void ResponseHandler::handleMessage(
         const std::vector<std::shared_ptr<ReferencedCommonData>>& packets
     ) {
-        usp_protocol::version1::ResponseMessageHandler handler;
+        const auto handler = std::make_shared<usp_protocol::version1::ResponseMessageHandler>();
         const std::vector<std::shared_ptr<
             usp_protocol::version1::ResponseMessage
         >> resolvedPackets = buildMessagePackets<usp_protocol::version1::ResponseMessage>(
             packets,
-            std::make_unique<usp_protocol::version1::ResponseMessageHandler>()
+            handler
         );
         const FinalResponseMessage finalMessage(
             packets,

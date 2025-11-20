@@ -32,6 +32,9 @@ namespace smart_home::usp_server::version1::message_handlers {
     class AcknowledgementHandler : public MessageHandler {
     public:
         ~AcknowledgementHandler() override = default;
+        explicit AcknowledgementHandler(
+            std::shared_ptr<utilities::patterns::EventChannel> serverEventChannel
+        );
 
         void handleMessage(
             const std::vector<std::shared_ptr<ReferencedCommonData>>& packets

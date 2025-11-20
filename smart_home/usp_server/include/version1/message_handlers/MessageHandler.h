@@ -1,7 +1,9 @@
 #pragma once
 
 #include <smart_home/usp_protocol/include/model/ProtocolMessageHandler.h>
+#include <smart_home/utilities/include/patterns/EventChannel.h>
 #include <iostream>
+#include <utility>
 #include <vector>
 
 #include "../ReferencedCommonData.h"
@@ -12,11 +14,24 @@ namespace smart_home::usp_server::version1::message_handlers {
     class MessageHandler {
     public:
         virtual ~MessageHandler() = default;
+        explicit MessageHandler(
+            std::shared_ptr<utilities::patterns::EventChannel> serverEventChannel
+        )
+            : serverEventChannel(std::move(serverEventChannel))
+        {}
 
         virtual void handleMessage(
             const std::vector<std::shared_ptr<ReferencedCommonData>>& packets
         ) = 0;
     protected:
+        std::shared_ptr<utilities::patterns::EventChannel> serverEventChannel;
+
+        void callForMessageType(
+            usp_protocol::version1::MessageType messageType,
+            const std::vector<std::shared_ptr<ReferencedCommonData>>& packets,
+            const std::function<void()>& callback
+        );
+
         template <
             typename TMessage,
             typename TSerialized = std::vector<char>,
@@ -25,7 +40,7 @@ namespace smart_home::usp_server::version1::message_handlers {
         >
         std::vector<std::shared_ptr<TMessage>> buildMessagePackets(
             const std::vector<std::shared_ptr<ReferencedCommonData>>& packets,
-            std::unique_ptr<THandler> handler
+            std::shared_ptr<THandler> handler
         ) const {
             std::vector<std::shared_ptr<TMessage>> messages;
 

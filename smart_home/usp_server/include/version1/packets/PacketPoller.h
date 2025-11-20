@@ -15,5 +15,6 @@ namespace smart_home::usp_server::version1::packets {
         virtual std::vector<std::shared_ptr<TPacket>> getAllPackets(const TId& requestId) = 0;
         virtual ssize_t getPacketsCount(const TId& requestId) = 0;
         virtual bool isSequenceComplete(const TId& requestId) = 0;
+        virtual void freeSequence(const TId& requestId) = 0;
     };
 } // namespace smart_home::usp_server::version1::packets

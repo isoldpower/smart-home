@@ -1,8 +1,13 @@
 #include "../../../include/version1/message_handlers/AcknowledgementHandler.h"
 
 #include <iostream>
+#include <utility>
 #include <smart_home/usp_protocol/include/version1/acknowledgement/AcknowledgementMessage.h>
 #include <smart_home/usp_protocol/include/version1/acknowledgement/AcknowledgementMessageHandler.h>
+
+#include "../../../include/version1/events/MessageReceivedEvent.h"
+#include "../../../include/version1/events/RequestSentEvent.h"
+#include "../../../include/version1/events/ServerEvents.h"
 
 
 namespace smart_home::usp_server::version1::message_handlers {
@@ -53,14 +58,42 @@ namespace smart_home::usp_server::version1::message_handlers {
         }
     }
 
+    AcknowledgementHandler::AcknowledgementHandler(
+        std::shared_ptr<utilities::patterns::EventChannel> serverEventChannel
+    )
+        : MessageHandler(std::move(serverEventChannel))
+    {
+        this->serverEventChannel->subscribe<events::MessageReceivedEvent>(
+            events::getEventName(events::ServerEvent::MessageReceivedEvent),
+            [&](const events::MessageReceivedEvent& event) -> std::any {
+                callForMessageType(
+                    usp_protocol::version1::MessageType::MESSAGE_ACKNOWLEDGEMENT,
+                    event.packetsList,
+                    [this, event]() {
+                        handleMessage(event.packetsList);
+                    }
+                );
+
+                return 0;
+            }
+        );
+
+        this->serverEventChannel->subscribe<events::RequestSentEvent>(
+            events::getEventName(events::ServerEvent::RequestSentEvent),
+            [&](const events::RequestSentEvent& event) -> std::any {
+            }
+        );
+    }
+
     void AcknowledgementHandler::handleMessage(
         const std::vector<std::shared_ptr<ReferencedCommonData>>& packets
     ) {
+        const auto handler = std::make_shared<usp_protocol::version1::AcknowledgementMessageHandler>();
         const std::vector<std::shared_ptr<
             usp_protocol::version1::AcknowledgementMessage
         >> resolvedPackets = buildMessagePackets<usp_protocol::version1::AcknowledgementMessage>(
             packets,
-            std::make_unique<usp_protocol::version1::AcknowledgementMessageHandler>()
+            handler
         );
         const FinalAcknowledgementMessage finalMessage(
             packets,

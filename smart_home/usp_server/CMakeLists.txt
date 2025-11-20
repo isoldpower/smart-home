@@ -8,12 +8,13 @@ add_library(usp_server STATIC
         src/version1/UspAsyncServer.cpp
         src/version1/ReferencedCommonData.cpp
         src/version1/packets/SequencedPacketPoller.cpp
-        src/version1/message_handlers/MessageHandlerBuilder.cpp
         src/version1/message_handlers/MessageHandler.cpp
         src/version1/message_handlers/AcknowledgementHandler.cpp
         src/version1/message_handlers/ProtocolHandler.cpp
         src/version1/message_handlers/RequestHandler.cpp
         src/version1/message_handlers/ResponseHandler.cpp
+        src/version1/events/MessageReceivedEvent.cpp
+        src/version1/events/RequestSentEvent.cpp
 )
 
 if (BUILD_TESTING)

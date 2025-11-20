@@ -24,6 +24,9 @@ namespace smart_home::usp_server::version1::message_handlers {
     class ResponseHandler : public MessageHandler {
     public:
         ~ResponseHandler() override = default;
+        explicit ResponseHandler(
+            std::shared_ptr<utilities::patterns::EventChannel> serverEventChannel
+        );
 
         void handleMessage(
             const std::vector<std::shared_ptr<ReferencedCommonData>>& packets

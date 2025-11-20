@@ -44,6 +44,7 @@ namespace smart_home::usp_server::version1::packets {
         std::vector<std::shared_ptr<TPacket>> getAllPackets(const TRequestId& requestId) override;
         ssize_t getPacketsCount(const TRequestId& requestId) override;
         bool isSequenceComplete(const TRequestId& requestId) override;
+        void freeSequence(const TRequestId& requestId) override;
     };
 
     extern template class SequencedPacketPoller<

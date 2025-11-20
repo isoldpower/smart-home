@@ -1,12 +1,13 @@
 #include "../../include/version1/UspAsyncServer.h"
 
 #include <smart_home/usp_protocol/include/version1/MessageBasisHandler.h>
+#include <smart_home/usp_server/include/version1/events/MessageReceivedEvent.h>
 
 #include "../../include/version1/packets/SequencedPacketPoller.h"
-#include "../../include/version1/message_handlers/MessageHandler.h"
-#include "../../include/version1/message_handlers/MessageHandlerBuilder.h"
 
 
+// TODO: Include message type to the packet poller as it can erase conflicts. For example:
+// ACK messages have the same RequestID as REQUEST messages do. It will packet poll twice.
 namespace smart_home::usp_server::version1 {
 
     UspAsyncServer::UspAsyncServer(
@@ -18,7 +19,13 @@ namespace smart_home::usp_server::version1 {
             uint16_t,
             ReferencedCommonData
         >>())
-    {}
+        , eventChannel(std::make_shared<utilities::patterns::EventChannel>())
+    {
+        requestHandler = std::make_unique<message_handlers::RequestHandler>(eventChannel);
+        responseHandler = std::make_unique<message_handlers::ResponseHandler>(eventChannel);
+        acknowledgmentHandler = std::make_unique<message_handlers::AcknowledgementHandler>(eventChannel);
+        protocolHandler = std::make_unique<message_handlers::ProtocolHandler>(eventChannel);
+    }
 
     void UspAsyncServer::sendRequest(
         const UspServerRequest&,
@@ -52,33 +59,40 @@ namespace smart_home::usp_server::version1 {
         const UspServerClient& client
     ) {
         const usp_protocol::version1::MessageBasisHandler basisHandler;
-        usp_protocol::version1::CommonMessagePacketData commonData =
-            basisHandler.parseCommonData(buffer, client.bytesReceived);
+        usp_protocol::version1::CommonMessagePacketData commonData = basisHandler.parseCommonData(
+            buffer,
+            client.bytesReceived
+        );
         commonPacketPoller->addPacket(
             commonData.requestId,
             std::make_shared<ReferencedCommonData>(commonData, buffer, client)
         );
 
         if (commonPacketPoller->isSequenceComplete(commonData.requestId)) {
-            std::vector<std::shared_ptr<ReferencedCommonData>> packets =
-                commonPacketPoller->getAllPackets(commonData.requestId);
-            std::vector<char*> packetBuffers;
-            packetBuffers.resize(commonData.packetsCount);
-            std::ranges::transform(
-                packets,
-                std::back_inserter(packetBuffers),
-                [](const std::shared_ptr<ReferencedCommonData>& packet) {
-                    return packet->getRawDataReference();
-                }
-            );
-
-            // Message can be considered completely received at this point.
-            // Need to properly process it. ACKs, Request Polling, connection establishment.
-            message_handlers::MessageHandlerBuilder builder;
-            const std::unique_ptr<message_handlers::MessageHandler> handler =
-                builder.buildMessageHandler(commonData);
-
-            handler->handleMessage(packets);
+            processCompleteMessage(commonData);
+            commonPacketPoller->freeSequence(commonData.requestId);
         }
+    }
+
+    void UspAsyncServer::processCompleteMessage(
+        const usp_protocol::version1::CommonMessagePacketData& referencePacket
+    ) const {
+        using PacketReference = std::shared_ptr<ReferencedCommonData>;
+        using ListOfPackets = std::vector<PacketReference>;
+
+        ListOfPackets packets = commonPacketPoller->getAllPackets(referencePacket.requestId);
+        std::vector<char*> packetBuffers;
+        packetBuffers.resize(referencePacket.packetsCount);
+        std::ranges::transform(
+            packets,
+            std::back_inserter(packetBuffers),
+            [](const PacketReference& packet) {
+                return packet->getRawDataReference();
+            }
+        );
+
+        // Message can be considered completely received at this point.
+        // Need to properly process it. ACKs, Request Polling, connection establishment.
+        eventChannel->dispatch(events::MessageReceivedEvent(packets));
     }
 } // namespace smart_home::usp_server::version1

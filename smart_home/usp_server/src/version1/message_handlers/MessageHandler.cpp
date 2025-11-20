@@ -5,6 +5,18 @@
 
 
 namespace smart_home::usp_server::version1::message_handlers {
+    void MessageHandler::callForMessageType(
+        const usp_protocol::version1::MessageType messageType,
+        const std::vector<std::shared_ptr<ReferencedCommonData>> &packets,
+        const std::function<void()>& callback
+    ) {
+        const bool emptyPackets = packets.empty();
+        const bool acknowledgementMessage = packets[0]->type == messageType;
+
+        if (!emptyPackets && acknowledgementMessage) {
+            callback();
+        }
+    }
 
     FinalMessage::FinalMessage(
         const std::vector<std::shared_ptr<ReferencedCommonData>>& packets

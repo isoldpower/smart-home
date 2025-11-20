@@ -83,6 +83,11 @@ namespace smart_home::usp_server::version1::packets {
     }
 
     template <typename TRequestId, typename TPacket>
+    void SequencedPacketPoller<TRequestId, TPacket>::freeSequence(const TRequestId &requestId) {
+        messagePackets.erase(requestId);
+    }
+
+    template <typename TRequestId, typename TPacket>
     bool SequencedPacketPoller<TRequestId, TPacket>::isSequenceValid(
         const TRequestId& requestId
     ) {

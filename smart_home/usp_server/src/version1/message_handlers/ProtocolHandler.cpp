@@ -1,6 +1,7 @@
 #include "../../../include/version1/message_handlers/ProtocolHandler.h"
 
 #include <iostream>
+#include <utility>
 #include <smart_home/usp_protocol/include/version1/protocol/ProtocolMessage.h>
 #include <smart_home/usp_protocol/include/version1/protocol/ProtocolMessageHandler.h>
 
@@ -23,14 +24,21 @@ namespace smart_home::usp_server::version1::message_handlers {
         )
     {}
 
+    ProtocolHandler::ProtocolHandler(
+        std::shared_ptr<utilities::patterns::EventChannel> serverEventChannel
+    )
+        : MessageHandler(std::move(serverEventChannel))
+    {}
+
     void ProtocolHandler::handleMessage(
         const std::vector<std::shared_ptr<ReferencedCommonData>>& packets
     ) {
+        const auto handler = std::make_shared<usp_protocol::version1::ProtocolMessageHandler>();
         const std::vector<std::shared_ptr<
             usp_protocol::version1::ProtocolMessage
         >> resolvedPackets = buildMessagePackets<usp_protocol::version1::ProtocolMessage>(
             packets,
-            std::make_unique<usp_protocol::version1::ProtocolMessageHandler>()
+            handler
         );
         const FinalProtocolMessage finalMessage(
             packets,
