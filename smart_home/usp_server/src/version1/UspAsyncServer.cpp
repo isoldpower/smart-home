@@ -2,10 +2,10 @@
 
 #include <smart_home/usp_protocol/include/version1/MessageBasisHandler.h>
 #include <smart_home/usp_server/include/version1/events/MessageReceivedEvent.h>
+#include <smart_home/usp_protocol/include/version1/request/RequestMessageHandler.h>
+#include <cmath>
 
 #include "../../include/version1/packets/SequencedPacketPoller.h"
-#include "version1/request/RequestMessageHandler.h"
-
 
 // TODO: Include message type to the packet poller as it can erase conflicts. For example:
 // ACK messages have the same RequestID as REQUEST messages do. It will packet poll twice.
