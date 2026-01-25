@@ -77,12 +77,6 @@ namespace smart_home::usp_server::version1::message_handlers {
                 return 0;
             }
         );
-
-        this->serverEventChannel->subscribe<events::RequestSentEvent>(
-            events::getEventName(events::ServerEvent::RequestSentEvent),
-            [&](const events::RequestSentEvent& event) -> std::any {
-            }
-        );
     }
 
     void AcknowledgementHandler::handleMessage(

@@ -4,6 +4,7 @@
 #include <smart_home/usp_server/include/version1/events/MessageReceivedEvent.h>
 
 #include "../../include/version1/packets/SequencedPacketPoller.h"
+#include "version1/request/RequestMessageHandler.h"
 
 
 // TODO: Include message type to the packet poller as it can erase conflicts. For example:
@@ -28,11 +29,47 @@ namespace smart_home::usp_server::version1 {
     }
 
     void UspAsyncServer::sendRequest(
-        const UspServerRequest&,
-        const web_server::NetServerClientInfo&,
-        ResponseReactionFunction
+        const UspServerRequest& request,
+        const web_server::NetServerClientInfo& client,
+        ResponseReactionFunction callback
     ) {
-        std::cout << "Trying to send request" << std::endl;
+        usp_protocol::version1::RequestMessageHandler handler;
+        const size_t packetsCount = ceil(
+            request.data.size() / usp_protocol::version1::MessageSettings::MAX_PACKET_SIZE
+        );
+
+        for (size_t i = 0; i < packetsCount; ++i) {
+            const std::string packetChunk = request.data.substr(
+                i * usp_protocol::version1::MessageSettings::MAX_PACKET_SIZE,
+                usp_protocol::version1::MessageSettings::MAX_PACKET_SIZE
+            );
+            usp_protocol::version1::RequestMessage packetData {
+                request.protocolVersion,
+                request.sessionId,
+                request.timestamp,
+                request.requestId,
+                i,
+                packetsCount,
+                request.auth,
+                request.actionGroup,
+                request.action,
+                request.size,
+                request.data
+            };
+
+            const std::unique_ptr<
+                usp_protocol::version1::RequestSerializationResult
+            > packet = handler.serialize(&packetData);
+            if (packet->getIsSuccess()) {
+                const std::string messageRaw{
+                    packet->getSerializationState()->begin(),
+                    packet->getSerializationState()->end()
+                };
+                if (netServer.sendMessage(messageRaw.data(), client)) {
+                    std::cout << "Message Sent" << std::endl;
+                }
+            }
+        }
     }
 
     void UspAsyncServer::tryReceiveMessage(
