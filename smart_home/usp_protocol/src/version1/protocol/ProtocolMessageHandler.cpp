@@ -2,7 +2,6 @@
 
 #include <smart_home/utilities/include/BinaryReader.h>
 
-#include "../../../include/ExecutionCodes.h"
 #include "../../../include/exceptions/ProtocolPacketException.h"
 
 
@@ -35,7 +34,7 @@ namespace smart_home::usp_protocol::version1 {
     std::unique_ptr<ProtocolDeserializationResult>
         ProtocolMessageHandler::deserialize(std::vector<char>* buffer)
     {
-        const CommonMessageData baseData = basisHandler->parseCommonData(
+        const CommonMessagePacketData baseData = basisHandler->parseCommonData(
             buffer->data(),
             buffer->size()
         );
@@ -48,6 +47,8 @@ namespace smart_home::usp_protocol::version1 {
             baseData.sessionId,
             baseData.timestamp,
             baseData.requestId,
+            baseData.packetIndex,
+            baseData.packetsCount,
             static_cast<ProtocolAction>(
                 determineAction(bufferData, bufferSize)
             ),
@@ -67,8 +68,10 @@ namespace smart_home::usp_protocol::version1 {
 
         if (length <= actionIndex) {
             throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                utilities::exceptions::ExceptionLevel::ERROR,
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer is too small to determine action"
             );
         } else {
@@ -81,8 +84,10 @@ namespace smart_home::usp_protocol::version1 {
 
         if (length <= sizeIndex) {
             throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                utilities::exceptions::ExceptionLevel::ERROR,
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer is too small to determine size"
             );
         } else {
@@ -95,8 +100,10 @@ namespace smart_home::usp_protocol::version1 {
 
         if (length <= dataIndex) {
             throw exceptions::ProtocolPacketException(
-                exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                utilities::exceptions::ExceptionLevel::ERROR,
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer is too small to determine data pointer"
             );
         } else {

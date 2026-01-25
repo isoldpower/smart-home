@@ -35,7 +35,7 @@ namespace smart_home::usp_protocol::version1 {
     std::unique_ptr<AcknowledgementDeserializationResult>
         AcknowledgementMessageHandler::deserialize(std::vector<char>* buffer)
     {
-        const CommonMessageData baseData = basisHandler->parseCommonData(
+        const CommonMessagePacketData baseData = basisHandler->parseCommonData(
             buffer->data(),
             buffer->size()
         );
@@ -48,6 +48,8 @@ namespace smart_home::usp_protocol::version1 {
             baseData.sessionId,
             baseData.timestamp,
             baseData.requestId,
+            baseData.packetIndex,
+            baseData.packetsCount,
             static_cast<AcknowledgementStatus>(
                 determineStatus(bufferData, bufferSize)
             ),
@@ -73,7 +75,9 @@ namespace smart_home::usp_protocol::version1 {
         if (length <= statusIndex) {
             throw exceptions::ProtocolPacketException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine ACK status."
             );
         } else {
@@ -92,7 +96,9 @@ namespace smart_home::usp_protocol::version1 {
         if (length <= sizeIndex) {
             throw exceptions::ProtocolPacketException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Data Size."
             );
         } else {
@@ -111,7 +117,9 @@ namespace smart_home::usp_protocol::version1 {
         if (length <= dataIndex) {
             throw exceptions::ProtocolPacketException(
                 utilities::exceptions::ExceptionLevel::ERROR,
-                castedExecutionCode(ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR),
+                exceptions::castedExecutionCode(
+                    exceptions::ExecutionCodes::RECEIVED_PACKAGE_SIZE_ERROR
+                ),
                 "Buffer length is too small to determine Data pointer."
             );
         } else {

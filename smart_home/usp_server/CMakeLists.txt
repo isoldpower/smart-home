@@ -1,10 +1,21 @@
 add_library(usp_server STATIC
         src/UspServerConfig.cpp
-        src/UspServerRequest.cpp
-        src/UspServerResponse.cpp
-        src/UspSyncServer.cpp
-        src/packets/SequencedPacketPoller.cpp
-        src/model/UspServer.cpp)
+        src/UspServerClient.cpp
+
+        src/exceptions/ReceivedMessageException.cpp
+        src/version1/UspServerRequest.cpp
+        src/version1/UspServerResponse.cpp
+        src/version1/UspAsyncServer.cpp
+        src/version1/ReferencedCommonData.cpp
+        src/version1/packets/SequencedPacketPoller.cpp
+        src/version1/message_handlers/MessageHandler.cpp
+        src/version1/message_handlers/AcknowledgementHandler.cpp
+        src/version1/message_handlers/ProtocolHandler.cpp
+        src/version1/message_handlers/RequestHandler.cpp
+        src/version1/message_handlers/ResponseHandler.cpp
+        src/version1/events/MessageReceivedEvent.cpp
+        src/version1/events/RequestSentEvent.cpp
+)
 
 if (BUILD_TESTING)
     add_executable(usp_server_tests tests/main.cpp)
@@ -14,4 +25,4 @@ if (BUILD_TESTING)
 endif()
 
 target_include_directories(usp_server INTERFACE include)
-target_link_libraries(usp_server PUBLIC cxx_setup utilities usp_protocol)
+target_link_libraries(usp_server PUBLIC cxx_setup utilities daemon usp_protocol)

@@ -21,6 +21,7 @@ namespace smart_home::daemon {
         explicit DaemonRunner(DaemonProcess* process);
 
         void cycleProcedure(const std::function<void()>& iterationAction) const;
+        void stopProcedure() const;
         void addWrapper(ProcedureWrapper* wrapper);
     };
 } // namespace smart_home::daemon

@@ -39,12 +39,10 @@ namespace smart_home::playground::commands {
             clientSocket = createSocket();
 
             const std::unique_ptr<sockaddr_in> serverAddress = openServerConnection(args);
-            const std::string messageData = "Vlad Lox TESTS-LUCK";
-
-            sendAcknowledgementMessage(messageData, clientSocket, serverAddress.get());
-            sendProtocolMessage(messageData, clientSocket, serverAddress.get());
-            sendRequestMessage(messageData, clientSocket, serverAddress.get());
-            sendResponseMessage(messageData, clientSocket, serverAddress.get());
+            sendAcknowledgementMessage("Acknowledgement", clientSocket, serverAddress.get());
+            sendProtocolMessage("Protocol", clientSocket, serverAddress.get());
+            sendRequestMessage("Request", clientSocket, serverAddress.get());
+            sendResponseMessage("Response", clientSocket, serverAddress.get());
 
             return 0;
         } catch (const std::exception& e) {
@@ -62,26 +60,31 @@ namespace smart_home::playground::commands {
         const int clientSocket,
         const sockaddr_in* serverAddress
     ) {
-        usp_protocol::version1::AcknowledgementMessage acknowledgeMessage{
-            usp_protocol::ProtocolVersion::VERSION_1,
-            322,
-            static_cast<uint64_t>(time(nullptr)),
-            12301,
-            usp_protocol::version1::AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
-            message.size(),
-            message
-        };
-        usp_protocol::version1::AcknowledgementMessageHandler handler;
-        const std::unique_ptr<
-            usp_protocol::version1::AcknowledgementSerializationResult
-        > packet = handler.serialize(&acknowledgeMessage);
-
-        if (packet->getIsSuccess()) {
-            std::string messageRaw{
-                packet->getSerializationState()->begin(),
-                packet->getSerializationState()->end()
+        constexpr size_t packetsCount = 3;
+        for (size_t i = 0; i < packetsCount; ++i) {
+            usp_protocol::version1::AcknowledgementMessage acknowledgeMessage{
+                usp_protocol::ProtocolVersion::VERSION_1,
+                322,
+                static_cast<uint64_t>(time(nullptr)),
+                12301,
+                i,
+                packetsCount,
+                usp_protocol::version1::AcknowledgementStatus::ACKNOWLEDGEMENT_SUCCESS,
+                message.size() + 1,
+                message + std::to_string(i)
             };
-            sendRequest(clientSocket, *serverAddress, messageRaw);
+            usp_protocol::version1::AcknowledgementMessageHandler handler;
+            const std::unique_ptr<
+                usp_protocol::version1::AcknowledgementSerializationResult
+            > packet = handler.serialize(&acknowledgeMessage);
+
+            if (packet->getIsSuccess()) {
+                std::string messageRaw{
+                    packet->getSerializationState()->begin(),
+                    packet->getSerializationState()->end()
+                };
+                sendRequest(clientSocket, *serverAddress, messageRaw);
+            }
         }
     }
 
@@ -90,27 +93,32 @@ namespace smart_home::playground::commands {
         const int clientSocket,
         const sockaddr_in* serverAddress
     ) {
-        usp_protocol::version1::ProtocolMessage protocolMessage{
-            usp_protocol::ProtocolVersion::VERSION_1,
-            322,
-            static_cast<uint64_t>(time(nullptr)),
-            12301,
-            usp_protocol::version1::ProtocolAction::ACTION_HEARTBEAT,
-            message.size(),
-            message
-        };
-
-        usp_protocol::version1::ProtocolMessageHandler handler;
-        const std::unique_ptr<
-            usp_protocol::version1::ProtocolSerializationResult
-        > packet = handler.serialize(&protocolMessage);
-
-        if (packet->getIsSuccess()) {
-            std::string messageRaw{
-                packet->getSerializationState()->begin(),
-                packet->getSerializationState()->end()
+        constexpr size_t packetsCount = 3;
+        for (size_t i = 0; i < packetsCount; ++i) {
+            usp_protocol::version1::ProtocolMessage protocolMessage{
+                usp_protocol::ProtocolVersion::VERSION_1,
+                322,
+                static_cast<uint64_t>(time(nullptr)),
+                12302,
+                i,
+                packetsCount,
+                usp_protocol::version1::ProtocolAction::ACTION_HEARTBEAT,
+                message.size() + 1,
+                message + std::to_string(i)
             };
-            sendRequest(clientSocket, *serverAddress, messageRaw);
+
+            usp_protocol::version1::ProtocolMessageHandler handler;
+            const std::unique_ptr<
+                usp_protocol::version1::ProtocolSerializationResult
+            > packet = handler.serialize(&protocolMessage);
+
+            if (packet->getIsSuccess()) {
+                const std::string messageRaw{
+                    packet->getSerializationState()->begin(),
+                    packet->getSerializationState()->end()
+                };
+                sendRequest(clientSocket, *serverAddress, messageRaw);
+            }
         }
     }
 
@@ -119,34 +127,35 @@ namespace smart_home::playground::commands {
         const int clientSocket,
         const sockaddr_in* serverAddress
     ) {
-        std::string authEmpty;
-        authEmpty.assign('A', 4);
-
-        usp_protocol::version1::RequestMessage requestMessage{
-            usp_protocol::ProtocolVersion::VERSION_1,
-            322,
-            static_cast<uint64_t>(time(nullptr)),
-            12301,
-            1,
-            0,
-            authEmpty,
-            0x01,
-            0x01,
-            message.size(),
-            message
-        };
-
-        usp_protocol::version1::RequestMessageHandler handler;
-        const std::unique_ptr<
-            usp_protocol::version1::RequestSerializationResult
-        > packet = handler.serialize(&requestMessage);
-
-        if (packet->getIsSuccess()) {
-            const std::string messageRaw{
-                packet->getSerializationState()->begin(),
-                packet->getSerializationState()->end()
+        constexpr size_t packetsCount = 3;
+        const std::string authEmpty(4, 'A');
+        for (size_t i = 0; i < packetsCount; ++i) {
+            usp_protocol::version1::RequestMessage requestMessage{
+                usp_protocol::ProtocolVersion::VERSION_1,
+                322,
+                static_cast<uint64_t>(time(nullptr)),
+                12303,
+                i,
+                packetsCount,
+                authEmpty,
+                0x01,
+                0x01,
+                message.size() + 1,
+                message + std::to_string(i)
             };
-            sendRequest(clientSocket, *serverAddress, messageRaw);
+
+            usp_protocol::version1::RequestMessageHandler handler;
+            const std::unique_ptr<
+                usp_protocol::version1::RequestSerializationResult
+            > packet = handler.serialize(&requestMessage);
+
+            if (packet->getIsSuccess()) {
+                const std::string messageRaw{
+                    packet->getSerializationState()->begin(),
+                    packet->getSerializationState()->end()
+                };
+                sendRequest(clientSocket, *serverAddress, messageRaw);
+            }
         }
     }
 
@@ -155,29 +164,32 @@ namespace smart_home::playground::commands {
         const int clientSocket,
         const sockaddr_in* serverAddress
     ) {
-        usp_protocol::version1::ResponseMessage responseMessage{
-            usp_protocol::ProtocolVersion::VERSION_1,
-            322,
-            static_cast<uint64_t>(time(nullptr)),
-            12301,
-            1,
-            0,
-            usp_protocol::version1::ResponseStatus::STATUS_OK,
-            message.size(),
-            message
-        };
-
-        usp_protocol::version1::ResponseMessageHandler handler;
-        const std::unique_ptr<
-            usp_protocol::version1::ResponseSerializationResult
-        > packet = handler.serialize(&responseMessage);
-
-        if (packet->getIsSuccess()) {
-            std::string messageRaw{
-                packet->getSerializationState()->begin(),
-                packet->getSerializationState()->end()
+        constexpr size_t packetsCount = 3;
+        for (size_t i = 0; i < packetsCount; ++i) {
+            usp_protocol::version1::ResponseMessage responseMessage{
+                usp_protocol::ProtocolVersion::VERSION_1,
+                322,
+                static_cast<uint64_t>(time(nullptr)),
+                12304,
+                i,
+                packetsCount,
+                usp_protocol::version1::ResponseStatus::STATUS_OK,
+                message.size() + 1,
+                message + std::to_string(i)
             };
-            sendRequest(clientSocket, *serverAddress, messageRaw);
+
+            usp_protocol::version1::ResponseMessageHandler handler;
+            const std::unique_ptr<
+                usp_protocol::version1::ResponseSerializationResult
+            > packet = handler.serialize(&responseMessage);
+
+            if (packet->getIsSuccess()) {
+                std::string messageRaw{
+                    packet->getSerializationState()->begin(),
+                    packet->getSerializationState()->end()
+                };
+                sendRequest(clientSocket, *serverAddress, messageRaw);
+            }
         }
     }
 

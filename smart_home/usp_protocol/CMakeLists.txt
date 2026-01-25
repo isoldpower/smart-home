@@ -1,7 +1,6 @@
 add_library(usp_protocol STATIC
-        src/CommonMessageData.cpp
-        src/MessageHandlerBuilder.cpp
-        src/MessageUnion.cpp
+        src/version1/CommonMessageData.cpp
+        src/version1/MessageUnion.cpp
         src/version1/acknowledgement/AcknowledgementMessage.cpp
         src/version1/acknowledgement/AcknowledgementMessageHandler.cpp
         src/version1/request/RequestMessage.cpp
@@ -12,7 +11,6 @@ add_library(usp_protocol STATIC
         src/version1/protocol/ProtocolMessageHandler.cpp
         src/version1/MessageBasisHandler.cpp
         src/version1/ProtocolVersion1.cpp
-        src/version1/BinaryMessageHandler.cpp
         src/exceptions/ProtocolAllocationException.cpp
         src/exceptions/ProtocolPacketException.cpp
         src/exceptions/ProtocolSerializationException.cpp

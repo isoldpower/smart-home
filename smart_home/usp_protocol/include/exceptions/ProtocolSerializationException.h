@@ -4,16 +4,15 @@
 
 
 namespace smart_home::usp_protocol::exceptions {
-    using namespace utilities::exceptions;
 
     class ProtocolSerializationException
-        : public CompleteException
+        : public utilities::exceptions::CompleteException
     {
     private:
         std::string messageRaw;
     public:
         explicit ProtocolSerializationException(
-            ExceptionLevel level,
+            utilities::exceptions::ExceptionLevel level,
             int errorCode,
             const char* message
         );

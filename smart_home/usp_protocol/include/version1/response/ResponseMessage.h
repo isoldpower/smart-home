@@ -2,9 +2,10 @@
 
 #include <array>
 #include <string>
+#include <ostream>
 
-#include "../../model/Message.h"
 #include "../BinaryMessage.h"
+#include "../Message.h"
 
 
 namespace smart_home::usp_protocol::version1 {
@@ -18,11 +19,11 @@ namespace smart_home::usp_protocol::version1 {
         REQUEST_ID_END = static_cast<size_t>(CommonMessageIndexes::REQUEST_ID_END),
         TIMESTAMP_START = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_START),
         TIMESTAMP_END = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END),
-        PACKETS_COUNT_BYTE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 1,
-        PACKET_INDEX_BYTE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 2,
-        STATUS_BYTE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 3,
-        SIZE_BYTE = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 4,
-        DATA_START = static_cast<size_t>(CommonMessageIndexes::TIMESTAMP_END) + 5,
+        PACKET_INDEX_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKET_INDEX_BYTE),
+        PACKETS_COUNT_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE),
+        STATUS_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 1,
+        SIZE_BYTE = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 2,
+        DATA_START = static_cast<size_t>(CommonMessageIndexes::PACKETS_COUNT_BYTE) + 3,
 
         internal_SegmentsCount = 10
     };
@@ -58,9 +59,8 @@ namespace smart_home::usp_protocol::version1 {
     };
 
     struct ResponseMessage
-        : public model::Message
+        : public Message
         , public ResponseMessageData
-        , public PacketMessage
     {
     public:
         explicit ResponseMessage(
@@ -68,8 +68,8 @@ namespace smart_home::usp_protocol::version1 {
             const uint16_t& sessionId,
             const uint64_t& timestamp,
             const uint16_t& requestId,
-            const size_t& packetsCount,
             const size_t& packetIndex,
+            const size_t& packetsCount,
             const ResponseStatus& status,
             const size_t& size,
             const std::string& data
@@ -77,4 +77,21 @@ namespace smart_home::usp_protocol::version1 {
 
         [[nodiscard]] bool isValid() const override;
     };
+
+    inline std::ostream& operator<<(std::ostream& os, const ResponseMessage& obj) {
+        os << "{\n"
+           << "\tversion: " << static_cast<int>(obj.protocolVersion) << ", \n"
+           << "\tsessionId: " << obj.sessionId << ", \n"
+           << "\ttimestamp: " << obj.timestamp << ", \n"
+           << "\trequestId: " << obj.requestId << ", \n"
+           << "\tpacketIndex: " << obj.packetIndex << ", \n"
+           << "\tpacketsCount: " << obj.packetsCount << ", \n"
+           << "\tstatus: " << static_cast<int>(obj.status) << ", \n"
+           << "\tsize: " << obj.size << ", \n"
+           << "\tdata: " << obj.data << "\n"
+           << "}";
+
+        return os;
+    }
+
 } // namespace smart_home::usp_protocol::version1

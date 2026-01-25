@@ -9,17 +9,17 @@ namespace smart_home::usp_protocol::model {
         struct DeserializationResult {
     private:
         TSerialized* referencedBuffer;
-        TMessage deserializationState = nullptr;
+        std::shared_ptr<TMessage> deserializationState = nullptr;
         bool success = false;
     public:
         DeserializationResult(bool success, TSerialized* buffer, TMessage message)
             : referencedBuffer(buffer)
-            , deserializationState(std::move(message))
+            , deserializationState(std::make_shared<TMessage>(message))
             , success(success)
         {}
 
-        [[nodiscard]] TMessage* getDeserializationState() {
-            return &deserializationState;
+        [[nodiscard]] std::shared_ptr<TMessage> getDeserializationState() {
+            return deserializationState;
         }
 
         [[nodiscard]] bool isSuccess() const {

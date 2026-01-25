@@ -18,25 +18,26 @@ namespace smart_home::usp_protocol::version1 {
         const uint16_t& sessionId,
         const uint64_t& timestamp,
         const uint16_t& requestId,
-        const size_t& packetsCount,
         const size_t& packetIndex,
+        const size_t& packetsCount,
         const ResponseStatus& status,
         const size_t& size,
         const std::string& data
     )
-        : model::Message(
+        : Message(
             protocolVersion,
             sessionId,
             MessageType::MESSAGE_RESPONSE,
             timestamp,
-            requestId
+            requestId,
+            packetIndex,
+            packetsCount
         )
         , ResponseMessageData(
             status,
             size,
             data
         )
-        , PacketMessage(packetsCount, packetIndex)
     {}
 
     bool ResponseMessage::isValid() const {
